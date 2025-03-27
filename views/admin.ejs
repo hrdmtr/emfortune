@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
   <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/cropper.css">
+  <!-- Cropper.js CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 </head>
 <body>
   <div class="container">
@@ -277,7 +280,45 @@
       <img id="preview-modal-image" src="" alt="画像プレビュー">
     </div>
   </div>
+  
+  <!-- 画像トリミングモーダル -->
+  <div id="image-crop-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>画像をトリミング</h3>
+      <div class="crop-container">
+        <div class="img-container">
+          <img id="crop-image" src="">
+        </div>
+        <div class="crop-help">
+          <p>マウスで自由に選択範囲を調整できます：</p>
+          <ul>
+            <li>ドラッグして新しい選択範囲を作成</li>
+            <li>選択範囲の端をドラッグしてサイズを変更</li>
+            <li>選択範囲の内側をドラッグして移動</li>
+            <li>ダブルクリックでモードを切り替え（選択/移動）</li>
+          </ul>
+        </div>
+        <div class="cropper-buttons">
+          <button type="button" class="cropper-button" id="crop-apply">切り抜いて適用</button>
+          <button type="button" class="cropper-button cancel" id="crop-cancel">キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Cropper.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script src="/js/admin.js"></script>
+  <!-- エラーの確認用：コンソールにCropper利用可能かのチェック -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Cropper available:', typeof Cropper);
+      if (typeof Cropper === 'undefined') {
+        console.error('Cropper.jsがロードされていません！');
+        alert('画像編集ライブラリが正しく読み込まれませんでした。インターネット接続を確認してページを再読み込みしてください。');
+      }
+    });
+  </script>
 </body>
 </html>

@@ -49,6 +49,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // ミドルウェアの設定
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
@@ -188,6 +189,76 @@ app.post('/admin/upload', upload.single('image'), (req, res) => {
     res.status(500).json({ 
       error: '画像のアップロード中にエラーが発生しました',
       message: error.message 
+    });
+  }
+});
+
+// 画像トリミングAPI
+app.post('/admin/crop', (req, res) => {
+  try {
+    console.log('トリミングリクエスト受信');
+    const { imagePath, cropData } = req.body;
+    
+    if (!imagePath) {
+      console.error('画像パスが指定されていません');
+      return res.status(400).json({ error: '画像パスが指定されていません' });
+    }
+    
+    console.log('処理対象の画像パス:', imagePath);
+    
+    // 元の画像のパスを取得（publicフォルダからの相対パス）
+    const originalPath = path.join(__dirname, 'public', imagePath);
+    console.log('元画像の絶対パス:', originalPath);
+    
+    // 新しいファイル名を生成（元のファイル名にcropped-をプレフィックスとして追加）
+    const originalFilename = path.basename(imagePath);
+    const originalDir = path.dirname(imagePath);
+    const newFilename = 'cropped-' + Date.now() + '-' + originalFilename;
+    
+    // 相対パスを確実に正しい形式に
+    let newRelativePath;
+    if (originalDir.startsWith('/')) {
+      // 既に/で始まっている場合は、先頭の/を削除して結合
+      newRelativePath = path.join(originalDir.substring(1), newFilename).replace(/\\/g, '/');
+    } else {
+      newRelativePath = path.join(originalDir, newFilename).replace(/\\/g, '/');
+    }
+    
+    // public内のフルパスを作成
+    const newFullPath = path.join(__dirname, 'public', newRelativePath);
+    
+    console.log('新しい画像パス:', newRelativePath);
+    console.log('新しい画像の絶対パス:', newFullPath);
+    
+    // ディレクトリが存在するか確認し、なければ作成
+    const targetDir = path.dirname(newFullPath);
+    if (!fs.existsSync(targetDir)) {
+      console.log('ディレクトリを作成:', targetDir);
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+    
+    // Base64データをバッファに変換
+    const base64Data = cropData.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // 新しいファイルへ書き込み
+    fs.writeFileSync(newFullPath, buffer);
+    console.log('画像を保存しました:', newFullPath);
+    
+    // 絶対パスではなく、webルートからの相対パスを返す
+    const webPath = '/' + newRelativePath.replace(/\\/g, '/');
+    console.log('Webアクセス用パス:', webPath);
+    
+    res.json({
+      success: true,
+      oldPath: imagePath,
+      newPath: webPath
+    });
+  } catch (error) {
+    console.error('画像トリミングエラー:', error);
+    res.status(500).json({
+      error: '画像のトリミング中にエラーが発生しました',
+      message: error.message
     });
   }
 });

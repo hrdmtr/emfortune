@@ -8,6 +8,21 @@ document.addEventListener('DOMContentLoaded', function() {
   const imagePreviewModal = document.getElementById('image-preview-modal');
   const previewModalImage = document.getElementById('preview-modal-image');
   
+  // 画像トリミングモーダル
+  const imageCropModal = document.getElementById('image-crop-modal');
+  const cropImage = document.getElementById('crop-image');
+  const cropApplyButton = document.getElementById('crop-apply');
+  const cropCancelButton = document.getElementById('crop-cancel');
+  
+  // クロッパーのインスタンス
+  let cropper = null;
+  
+  // 現在処理中の画像情報
+  let currentImageInfo = {
+    targetInput: null,
+    originalPath: null
+  };
+  
   // ファイルアップロード関連
   const fileInputs = document.querySelectorAll('.file-input');
   
@@ -27,16 +42,23 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       
       // プレビューをクリックしたら拡大表示
-      previewDiv.addEventListener('click', function() {
+      previewDiv.addEventListener('click', function(e) {
         if (input.value && !previewDiv.classList.contains('error') && !previewDiv.classList.contains('empty')) {
-          previewModalImage.src = input.value;
-          imagePreviewModal.style.display = 'block';
-          
-          // 画像読み込みエラー時の処理
-          previewModalImage.onerror = function() {
-            imagePreviewModal.style.display = 'none';
-            alert('画像を読み込めませんでした: ' + input.value);
-          };
+          // Shiftキーを押しながらクリックするとトリミングモードになる
+          if (e.shiftKey) {
+            // トリミングモードを開始
+            openCropModal(input.value, input);
+          } else {
+            // 通常の拡大表示
+            previewModalImage.src = input.value;
+            imagePreviewModal.style.display = 'block';
+            
+            // 画像読み込みエラー時の処理
+            previewModalImage.onerror = function() {
+              imagePreviewModal.style.display = 'none';
+              alert('画像を読み込めませんでした: ' + input.value);
+            };
+          }
         }
       });
     }
@@ -51,6 +73,205 @@ document.addEventListener('DOMContentLoaded', function() {
   imagePreviewModal.addEventListener('click', function(event) {
     if (event.target === imagePreviewModal) {
       imagePreviewModal.style.display = 'none';
+    }
+  });
+  
+  // トリミングモーダルを開く関数
+  function openCropModal(imagePath, inputElement) {
+    console.log('トリミングモーダルを開く:', imagePath);
+    
+    // 現在の画像情報を保存
+    currentImageInfo.targetInput = inputElement;
+    currentImageInfo.originalPath = imagePath;
+    
+    // クロップモーダルを表示
+    imageCropModal.style.display = 'block';
+    
+    // 画像をセット
+    console.log('画像をセット:', imagePath);
+    cropImage.src = imagePath;
+    
+    // 既存のクロッパーがあれば破棄
+    if (cropper) {
+      console.log('既存のクロッパーを破棄');
+      cropper.destroy();
+      cropper = null;
+    }
+    
+    // 画像が読み込まれたらクロッパーを初期化
+    cropImage.onload = function() {
+      console.log('画像が読み込まれた、クロッパーを初期化');
+      try {
+        cropper = new Cropper(cropImage, {
+          aspectRatio: NaN, // アスペクト比制限なし（自由な形状で選択可能）
+          viewMode: 1,    // 画像全体が見えるモード
+          guides: true,   // ガイドラインを表示
+          autoCropArea: 0.8, // 自動選択エリアの大きさ（0〜1）
+          responsive: true,
+          restore: false,
+          dragMode: 'crop',  // デフォルトのドラッグモードを 'crop' に設定
+          cropBoxMovable: true,  // 選択範囲の移動を許可
+          cropBoxResizable: true, // 選択範囲のサイズ変更を許可
+          toggleDragModeOnDblclick: true // ダブルクリックでドラッグモードを切り替え
+        });
+        console.log('クロッパー初期化成功');
+      } catch (error) {
+        console.error('クロッパー初期化エラー:', error);
+        alert('画像のトリミング機能の初期化に失敗しました。ブラウザのコンソールを確認してください。');
+      }
+    };
+    
+    // 画像読み込みエラー時の処理
+    cropImage.onerror = function(error) {
+      console.error('画像読み込みエラー:', error);
+      alert('画像の読み込みに失敗しました: ' + imagePath);
+      imageCropModal.style.display = 'none';
+    };
+  }
+  
+  // トリミングを適用
+  cropApplyButton.addEventListener('click', function() {
+    console.log('トリミングを適用ボタンがクリックされました');
+    
+    if (!cropper) {
+      console.error('クロッパーが初期化されていません');
+      alert('トリミングツールが初期化されていません。ページを再読み込みして再試行してください。');
+      return;
+    }
+    
+    try {
+      console.log('クロップデータを取得中...');
+      // クロップデータをBase64形式で取得
+      const canvas = cropper.getCroppedCanvas({
+        maxWidth: 800,      // 最大幅
+        maxHeight: 800,     // 最大高さ
+        fillColor: '#fff',  // 背景色
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+      });
+      
+      if (!canvas) {
+        console.error('クロップキャンバスが取得できませんでした');
+        alert('トリミングデータの取得に失敗しました。選択領域を確認してください。');
+        return;
+      }
+      
+      console.log('クロップキャンバスが取得できました、データURLに変換中...');
+      const cropData = canvas.toDataURL('image/jpeg', 0.9); // 90%品質のJPEG
+      console.log('データURLの長さ:', cropData.length);
+      
+      console.log('サーバーにクロップデータを送信中...');
+      console.log('元画像パス:', currentImageInfo.originalPath);
+      
+      // サーバーにクロップデータを送信
+      fetch('/admin/crop', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          imagePath: currentImageInfo.originalPath,
+          cropData: cropData
+        })
+      })
+      .then(response => {
+        console.log('サーバーからのレスポンス:', response.status);
+        if (!response.ok) {
+          throw new Error('サーバーからエラーレスポンス: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('サーバーからのデータ:', data);
+        if (data.success) {
+          console.log('トリミング成功、新しいパス:', data.newPath);
+          
+          // 入力フィールドを新しいパスで更新
+          // ブラウザのキャッシュを回避するためにユニークなタイムスタンプを追加
+          const cacheBuster = '?t=' + new Date().getTime();
+          const newPathWithCache = data.newPath + cacheBuster;
+          
+          currentImageInfo.targetInput.value = data.newPath; // 実際のフォームデータには元のパスを保存
+          
+          // プレビューの更新
+          const previewId = 'preview-' + currentImageInfo.targetInput.id.replace('-image', '');
+          const previewDiv = document.getElementById(previewId);
+          console.log('プレビュー要素を更新:', previewId);
+          console.log('キャッシュ回避用パス:', newPathWithCache);
+          updateImagePreview(previewDiv, newPathWithCache);
+          
+          // モーダルを閉じる
+          imageCropModal.style.display = 'none';
+          
+          // クロッパーをクリーンアップ
+          if (cropper) {
+            cropper.destroy();
+            cropper = null;
+          }
+          
+          // 成功メッセージを表示
+          const statusId = 'status-' + currentImageInfo.targetInput.id.replace('-image', '');
+          console.log('ステータス要素ID:', statusId);
+          const statusEl = document.getElementById(statusId);
+          if (statusEl) {
+            statusEl.innerHTML = '✓ トリミング完了！新しい画像を適用しました';
+            statusEl.className = 'upload-status success';
+            
+            // 数秒後にステータスメッセージをクリア
+            setTimeout(() => {
+              statusEl.textContent = '';
+            }, 5000);
+          } else {
+            console.warn('ステータス要素が見つかりません:', statusId);
+            alert('画像のトリミングが完了しました');
+          }
+        } else {
+          throw new Error(data.error || 'トリミングに失敗しました');
+        }
+      })
+      .catch(error => {
+        console.error('トリミングエラー:', error);
+        alert('トリミングに失敗しました: ' + error.message);
+      });
+    } catch (error) {
+      console.error('トリミング処理エラー:', error);
+      alert('トリミング処理中にエラーが発生しました: ' + error.message);
+    }
+  });
+  
+  // トリミングをキャンセル
+  cropCancelButton.addEventListener('click', function() {
+    console.log('トリミングがキャンセルされました');
+    imageCropModal.style.display = 'none';
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+  });
+  
+  // モーダルのクローズボタンでトリミングをキャンセル
+  const cropModalCloseBtn = imageCropModal.querySelector('.close');
+  if (cropModalCloseBtn) {
+    cropModalCloseBtn.addEventListener('click', function() {
+      console.log('トリミングモーダルのクローズボタンがクリックされました');
+      imageCropModal.style.display = 'none';
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    });
+  } else {
+    console.error('トリミングモーダルのクローズボタンが見つかりません');
+  }
+  
+  // 背景クリックでトリミングモーダルを閉じる
+  imageCropModal.addEventListener('click', function(event) {
+    if (event.target === imageCropModal) {
+      imageCropModal.style.display = 'none';
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
     }
   });
   
@@ -104,14 +325,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.success) {
           // アップロード成功
           targetInput.value = data.filePath;
-          updateImagePreview(document.getElementById('preview-' + targetId.replace('-image', '')), data.filePath);
-          statusEl.textContent = 'アップロード完了: ' + data.originalName;
+          const previewEl = document.getElementById('preview-' + targetId.replace('-image', ''));
+          updateImagePreview(previewEl, data.filePath);
+          
+          // ステータスメッセージを更新
+          statusEl.innerHTML = 'アップロード完了: ' + data.originalName + 
+                              ' <a href="#" class="crop-link">トリミングする</a>';
           statusEl.className = 'upload-status success';
+          
+          // トリミングリンクにイベントリスナーを追加
+          const cropLink = statusEl.querySelector('.crop-link');
+          if (cropLink) {
+            cropLink.addEventListener('click', function(e) {
+              e.preventDefault();
+              openCropModal(data.filePath, targetInput);
+            });
+          }
           
           // 数秒後にステータスメッセージをクリア
           setTimeout(() => {
             statusEl.textContent = '';
-          }, 5000);
+          }, 10000);
         } else {
           throw new Error(data.error || 'アップロードに失敗しました');
         }
@@ -139,18 +373,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // ローディング状態にする
     previewElement.classList.add('loading');
     
+    // 画像パスが正しい形式かチェック
+    let imgSrc = imagePath;
+    
+    // http://で始まるURLを修正 (相対パスに変換)
+    if (imgSrc.startsWith('http://')) {
+      console.warn('http://で始まるURLが検出されました、修正します:', imgSrc);
+      imgSrc = imgSrc.replace(/^http:\/\/[^\/]+/, '');
+      console.log('修正後のパス:', imgSrc);
+    }
+    
+    // パスの先頭に/がなければ追加
+    if (!imgSrc.startsWith('/')) {
+      console.warn('相対パスが/で始まっていません、修正します:', imgSrc);
+      imgSrc = '/' + imgSrc;
+      console.log('修正後のパス:', imgSrc);
+    }
+    
+    console.log('画像読み込み試行:', imgSrc);
+    
     // 画像の存在確認
     const img = new Image();
     img.onload = function() {
-      previewElement.style.backgroundImage = `url(${imagePath})`;
+      console.log('画像読み込み成功:', imgSrc);
+      previewElement.style.backgroundImage = `url(${imgSrc})`;
       previewElement.classList.remove('loading');
     };
     img.onerror = function() {
+      console.error('画像読み込みエラー:', imgSrc);
       previewElement.style.backgroundImage = 'none';
       previewElement.classList.remove('loading');
       previewElement.classList.add('error');
     };
-    img.src = imagePath;
+    img.src = imgSrc;
   }
   
   // 質問追加ボタン
