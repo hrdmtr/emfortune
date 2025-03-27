@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 | EMFortune</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>EMFortune 管理画面</h1>
+    </header>
+    <main>
+      <div class="admin-section">
+        <h2>質問・回答の管理</h2>
+        
+        <div class="admin-panel">
+          <h3>質問一覧</h3>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>質問内容</th>
+                  <th>選択肢数</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% questions.forEach(question => { %>
+                  <tr>
+                    <td><%= question.id %></td>
+                    <td><%= question.text %></td>
+                    <td><%= question.options.length %></td>
+                    <td class="actions">
+                      <button class="action-btn edit-btn" data-id="<%= question.id %>">編集</button>
+                      <button class="action-btn delete-btn" data-id="<%= question.id %>">削除</button>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="add-container">
+            <button id="add-question-btn" class="primary-btn">新しい質問を追加</button>
+          </div>
+        </div>
+        
+        <div class="admin-panel">
+          <h3>診断結果の設定</h3>
+          <div class="data-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>オプション</th>
+                  <th>タイプ名</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% Object.keys(results).forEach(key => { %>
+                  <tr>
+                    <td><%= key %></td>
+                    <td><%= results[key].personality %></td>
+                    <td class="actions">
+                      <button class="action-btn edit-btn" data-option="<%= key %>">編集</button>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="admin-panel">
+          <h3>CSVインポート/エクスポート</h3>
+          <div class="import-export-section">
+            <div class="import-section">
+              <h4>CSVインポート</h4>
+              <form action="/admin/import" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                  <label for="csv-type">データタイプ</label>
+                  <select id="csv-type" name="csvType" required>
+                    <option value="questions">質問データ</option>
+                    <option value="results">診断結果データ</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="csv-file">CSVファイル</label>
+                  <input type="file" id="csv-file" name="csvFile" accept=".csv" required>
+                </div>
+                <button type="submit" class="primary-btn">インポート</button>
+              </form>
+            </div>
+            
+            <div class="export-section">
+              <h4>CSVエクスポート</h4>
+              <div class="export-buttons">
+                <a href="/admin/export/questions" class="primary-btn">質問データをエクスポート</a>
+                <a href="/admin/export/results" class="primary-btn">診断結果データをエクスポート</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="back-link">
+        <a href="/" class="link-btn">アプリトップに戻る</a>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2025 EMFortune</p>
+    </footer>
+  </div>
+  
+  <!-- 質問追加/編集モーダル (簡易的な実装) -->
+  <div id="question-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modal-title">質問を追加</h3>
+      <form id="question-form">
+        <div class="form-group">
+          <label for="question-text">質問内容</label>
+          <input type="text" id="question-text" name="text" required>
+        </div>
+        
+        <!-- オプションA -->
+        <div class="option-group">
+          <h4>選択肢A</h4>
+          <div class="form-group">
+            <label for="optionA-text">テキスト</label>
+            <input type="text" id="optionA-text" name="optionA_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionA-image">画像パス</label>
+            <input type="text" id="optionA-image" name="optionA_image" placeholder="/images/example.png" required>
+          </div>
+        </div>
+        
+        <!-- オプションB -->
+        <div class="option-group">
+          <h4>選択肢B</h4>
+          <div class="form-group">
+            <label for="optionB-text">テキスト</label>
+            <input type="text" id="optionB-text" name="optionB_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionB-image">画像パス</label>
+            <input type="text" id="optionB-image" name="optionB_image" placeholder="/images/example.png" required>
+          </div>
+        </div>
+        
+        <!-- オプションC -->
+        <div class="option-group">
+          <h4>選択肢C</h4>
+          <div class="form-group">
+            <label for="optionC-text">テキスト</label>
+            <input type="text" id="optionC-text" name="optionC_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionC-image">画像パス</label>
+            <input type="text" id="optionC-image" name="optionC_image" placeholder="/images/example.png" required>
+          </div>
+        </div>
+        
+        <!-- オプションD -->
+        <div class="option-group">
+          <h4>選択肢D</h4>
+          <div class="form-group">
+            <label for="optionD-text">テキスト</label>
+            <input type="text" id="optionD-text" name="optionD_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionD-image">画像パス</label>
+            <input type="text" id="optionD-image" name="optionD_image" placeholder="/images/example.png" required>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">保存</button>
+          <button type="button" class="secondary-btn modal-cancel">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 診断結果編集モーダル -->
+  <div id="result-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>診断結果を編集</h3>
+      <form id="result-form">
+        <input type="hidden" id="result-option" name="option">
+        
+        <div class="form-group">
+          <label for="personality">タイプ名</label>
+          <input type="text" id="personality" name="personality" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">説明</label>
+          <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="workCompatibility">仕事との相性</label>
+          <textarea id="workCompatibility" name="workCompatibility" rows="2" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="relationshipCompatibility">人間関係の相性</label>
+          <textarea id="relationshipCompatibility" name="relationshipCompatibility" rows="2" required></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">保存</button>
+          <button type="button" class="secondary-btn modal-cancel">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="/js/admin.js"></script>
+</body>
+</html>
