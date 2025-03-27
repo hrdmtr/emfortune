@@ -1,0 +1,169 @@
+/* ダッシュボードのスタイル */
+.admin-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  margin-right: 10px;
+}
+
+.tab.active {
+  color: #7c4dff;
+  border-bottom: 2px solid #7c4dff;
+  font-weight: bold;
+}
+
+.last-updated {
+  color: #888;
+  font-size: 0.9rem;
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.dashboard-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.dashboard-card h3 {
+  margin: 0 0 15px 0;
+  color: #7c4dff;
+  font-size: 1.2rem;
+}
+
+.big-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: #444;
+  margin: 15px 0;
+}
+
+.breakdown {
+  margin-top: 20px;
+}
+
+.breakdown h4 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.breakdown ul {
+  list-style: none;
+  padding: 0;
+}
+
+.breakdown li {
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+/* グラフスタイル */
+.chart-container {
+  margin-top: 15px;
+}
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chart-item {
+  display: flex;
+  align-items: center;
+}
+
+.chart-label {
+  width: 100px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.chart-bar {
+  height: 25px;
+  background-color: #7c4dff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 10px;
+  border-radius: 4px;
+  min-width: 40px;
+  transition: width 0.5s ease-in-out;
+}
+
+.chart-blue {
+  background-color: #4285f4;
+}
+
+.chart-cyan {
+  background-color: #1da1f2;
+}
+
+.chart-gray {
+  background-color: #9e9e9e;
+}
+
+/* コンバージョンファネル */
+.funnel {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.funnel-step {
+  width: 80%;
+  background-color: #f8f5ff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.funnel-arrow {
+  font-size: 1.5rem;
+  color: #7c4dff;
+  margin: 5px 0;
+}
+
+.funnel-label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.funnel-value {
+  font-weight: bold;
+  color: #7c4dff;
+}
+
+.description {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

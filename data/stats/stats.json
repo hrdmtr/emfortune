@@ -1,0 +1,21 @@
+{
+  "questions": {
+    "total": 0,
+    "byId": {}
+  },
+  "results": {
+    "total": 0,
+    "byType": {
+      "A": 0,
+      "B": 0,
+      "C": 0,
+      "D": 0
+    }
+  },
+  "sources": {
+    "direct": 0,
+    "twitter": 0,
+    "other": 0
+  },
+  "lastUpdated": ""
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | EMFortune</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>EMFortune 管理画面</h1>
+    </header>
+    <main>
+      <div class="admin-tabs">
+        <a href="/admin" class="tab">質問管理</a>
+        <a href="/admin/dashboard" class="tab active">アクセス統計</a>
+      </div>
+      
+      <div class="admin-section">
+        <h2>アクセス統計ダッシュボード</h2>
+        <p class="last-updated">最終更新: <%= new Date(stats.lastUpdated).toLocaleString('ja-JP') %></p>
+        
+        <div class="dashboard-grid">
+          <!-- 質問表示数 -->
+          <div class="dashboard-card">
+            <h3>質問表示数</h3>
+            <div class="big-number"><%= stats.questions.total.toLocaleString() %></div>
+            <div class="breakdown">
+              <h4>質問別表示数:</h4>
+              <ul>
+                <% Object.keys(stats.questions.byId).forEach(id => { %>
+                  <li>質問 #<%= id %>: <%= stats.questions.byId[id].toLocaleString() %>回</li>
+                <% }); %>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- 結果表示数 -->
+          <div class="dashboard-card">
+            <h3>診断結果表示数</h3>
+            <div class="big-number"><%= stats.results.total.toLocaleString() %></div>
+            <div class="breakdown">
+              <h4>タイプ別結果:</h4>
+              <div class="chart-container">
+                <div class="bar-chart">
+                  <% const maxResult = Math.max(...Object.values(stats.results.byType)); %>
+                  <% Object.keys(stats.results.byType).forEach(type => { %>
+                    <div class="chart-item">
+                      <div class="chart-label">タイプ <%= type %></div>
+                      <div class="chart-bar" style="width: <%= stats.results.byType[type] / maxResult * 100 %>%;">
+                        <%= stats.results.byType[type] %>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 流入元 -->
+          <div class="dashboard-card">
+            <h3>アクセス流入元</h3>
+            <div class="big-number"><%= (stats.sources.direct + stats.sources.twitter + stats.sources.other).toLocaleString() %></div>
+            <div class="breakdown">
+              <h4>流入元の内訳:</h4>
+              <div class="chart-container">
+                <div class="bar-chart">
+                  <div class="chart-item">
+                    <div class="chart-label">直接訪問</div>
+                    <div class="chart-bar chart-blue" style="width: <%= stats.sources.direct / (stats.sources.direct + stats.sources.twitter + stats.sources.other) * 100 %>%;">
+                      <%= stats.sources.direct %>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <div class="chart-label">Twitter</div>
+                    <div class="chart-bar chart-cyan" style="width: <%= stats.sources.twitter / (stats.sources.direct + stats.sources.twitter + stats.sources.other) * 100 %>%;">
+                      <%= stats.sources.twitter %>
+                    </div>
+                  </div>
+                  <div class="chart-item">
+                    <div class="chart-label">その他</div>
+                    <div class="chart-bar chart-gray" style="width: <%= stats.sources.other / (stats.sources.direct + stats.sources.twitter + stats.sources.other) * 100 %>%;">
+                      <%= stats.sources.other %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- コンバージョン率 -->
+          <div class="dashboard-card">
+            <h3>コンバージョン率</h3>
+            <% const conversionRate = stats.questions.total > 0 ? (stats.results.total / stats.questions.total * 100).toFixed(1) : 0; %>
+            <div class="big-number"><%= conversionRate %>%</div>
+            <div class="description">
+              <p>質問表示から診断結果までの到達率です。</p>
+              <div class="funnel">
+                <div class="funnel-step">
+                  <div class="funnel-label">質問表示</div>
+                  <div class="funnel-value"><%= stats.questions.total.toLocaleString() %></div>
+                </div>
+                <div class="funnel-arrow">↓</div>
+                <div class="funnel-step">
+                  <div class="funnel-label">診断結果表示</div>
+                  <div class="funnel-value"><%= stats.results.total.toLocaleString() %></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="back-link">
+        <a href="/" class="link-btn">アプリトップに戻る</a>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2025 EMFortune</p>
+    </footer>
+  </div>
+  
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
