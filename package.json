@@ -16,6 +16,9 @@
   ],
   "author": "EMFortune Team",
   "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "csv-parser": "^3.2.0",
     "ejs": "^3.1.10",

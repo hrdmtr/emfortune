@@ -15,10 +15,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-  secret: 'emfortune-secret-key',
+  secret: process.env.SESSION_SECRET || 'emfortune-secret-key',
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 60 * 60 * 1000 } // 1時間
+  cookie: { 
+    maxAge: 60 * 60 * 1000, // 1時間
+    secure: process.env.NODE_ENV === 'production'
+  }
 }));
 
 // ホームページのルート

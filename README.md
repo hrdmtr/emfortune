@@ -34,6 +34,23 @@ npm install
 npm start
 ```
 
+## デプロイ方法 (Render.com)
+
+このプロジェクトはRender.comに簡単にデプロイできます：
+
+1. GitHubにリポジトリをプッシュします
+2. [Render.com](https://render.com)にアカウント登録/ログインします
+3. ダッシュボードから「New +」→「Web Service」を選択します
+4. GitHubリポジトリに接続します
+5. 以下の設定を行います：
+   - Name: emfortune（任意）
+   - Environment: Node
+   - Build Command: `npm install`
+   - Start Command: `node index.js`
+6. 「Create Web Service」をクリックしてデプロイを開始します
+
+または、リポジトリのルートにある `render.yaml` ファイルを使用して、「Blueprint」からデプロイすることもできます。
+
 ## 今後の開発計画
 
 - Twitter OAuth連携
