@@ -118,6 +118,24 @@ app.get('/admin/dashboard', (req, res) => {
   }
 });
 
+// 質問データ取得API
+app.get('/admin/question/:id', async (req, res) => {
+  try {
+    const questionId = parseInt(req.params.id);
+    const questions = await loadQuestions();
+    const question = questions.find(q => q.id === questionId);
+    
+    if (!question) {
+      return res.status(404).json({ error: '質問が見つかりません' });
+    }
+    
+    res.json(question);
+  } catch (error) {
+    console.error('質問データの取得エラー:', error);
+    res.status(500).json({ error: '質問データの取得中にエラーが発生しました' });
+  }
+});
+
 // サーバーの起動
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

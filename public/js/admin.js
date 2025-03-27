@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const resultModal = document.getElementById('result-modal');
   const closeButtons = document.querySelectorAll('.close, .modal-cancel');
   
+  // 画像プレビューモーダル
+  const imagePreviewModal = document.getElementById('image-preview-modal');
+  const previewModalImage = document.getElementById('preview-modal-image');
+  
   // 画像パスのプレビュー機能
   const imageInputs = document.querySelectorAll('input[id$="-image"]');
   imageInputs.forEach(input => {
@@ -11,17 +15,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewDiv = document.getElementById(previewId);
     
     if (previewDiv) {
-      // 初期値があればプレビューに表示
-      if (input.value) {
-        previewDiv.style.backgroundImage = `url(${input.value})`;
-      }
+      // 初期状態を設定
+      updateImagePreview(previewDiv, input.value);
       
       // 入力が変更されたらプレビューを更新
       input.addEventListener('input', function() {
-        previewDiv.style.backgroundImage = input.value ? `url(${input.value})` : 'none';
+        updateImagePreview(previewDiv, input.value);
+      });
+      
+      // プレビューをクリックしたら拡大表示
+      previewDiv.addEventListener('click', function() {
+        if (input.value && !previewDiv.classList.contains('error') && !previewDiv.classList.contains('empty')) {
+          previewModalImage.src = input.value;
+          imagePreviewModal.style.display = 'block';
+          
+          // 画像読み込みエラー時の処理
+          previewModalImage.onerror = function() {
+            imagePreviewModal.style.display = 'none';
+            alert('画像を読み込めませんでした: ' + input.value);
+          };
+        }
       });
     }
   });
+  
+  // プレビューモーダルを閉じる
+  imagePreviewModal.querySelector('.close').addEventListener('click', function() {
+    imagePreviewModal.style.display = 'none';
+  });
+  
+  // 背景クリックでプレビューモーダルを閉じる
+  imagePreviewModal.addEventListener('click', function(event) {
+    if (event.target === imagePreviewModal) {
+      imagePreviewModal.style.display = 'none';
+    }
+  });
+  
+  // 画像プレビューを更新する関数
+  function updateImagePreview(previewElement, imagePath) {
+    // クラスをリセット
+    previewElement.classList.remove('loading', 'error', 'empty');
+    
+    if (!imagePath) {
+      // 画像パスが空の場合
+      previewElement.style.backgroundImage = 'none';
+      previewElement.classList.add('empty');
+      return;
+    }
+    
+    // ローディング状態にする
+    previewElement.classList.add('loading');
+    
+    // 画像の存在確認
+    const img = new Image();
+    img.onload = function() {
+      previewElement.style.backgroundImage = `url(${imagePath})`;
+      previewElement.classList.remove('loading');
+    };
+    img.onerror = function() {
+      previewElement.style.backgroundImage = 'none';
+      previewElement.classList.remove('loading');
+      previewElement.classList.add('error');
+    };
+    img.src = imagePath;
+  }
   
   // 質問追加ボタン
   const addQuestionBtn = document.getElementById('add-question-btn');
@@ -56,6 +113,15 @@ document.addEventListener('DOMContentLoaded', function() {
     addQuestionBtn.addEventListener('click', function() {
       document.getElementById('modal-title').textContent = '質問を追加';
       document.getElementById('question-form').reset();
+      
+      // すべてのプレビューを空の状態に更新
+      ['A', 'B', 'C', 'D'].forEach(letter => {
+        const previewDiv = document.getElementById(`preview-option${letter}`);
+        if (previewDiv) {
+          updateImagePreview(previewDiv, '');
+        }
+      });
+      
       questionModal.style.display = 'block';
     });
   }
@@ -64,17 +130,55 @@ document.addEventListener('DOMContentLoaded', function() {
   editQuestionBtns.forEach(button => {
     button.addEventListener('click', function() {
       const questionId = this.getAttribute('data-id');
+      const questionRow = this.closest('tr');
       
-      // 本来はここでサーバーから質問データを取得する
-      // ここでは簡易的に実装
-      document.getElementById('modal-title').textContent = '質問を編集';
+      // ローディング表示
+      document.getElementById('modal-title').textContent = '質問を編集中...';
+      document.getElementById('question-form').reset();
       
-      // フォームに質問データをセット（実際の実装では非同期通信で取得）
-      // ここではモックデータを使用
-      document.getElementById('question-text').value = '質問内容がここに表示されます';
-      document.getElementById('optionA-text').value = 'オプションAのテキスト';
-      document.getElementById('optionA-image').value = '/images/option-a.png';
-      // 他のオプションも同様に設定
+      // 実際のデータを取得（テーブルから）
+      const questionText = questionRow.querySelector('td:nth-child(2)').textContent;
+      
+      // 非同期でCSVから該当の質問データを取得
+      fetch(`/admin/question/${questionId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('質問データの取得に失敗しました');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // 取得したデータをフォームにセット
+          document.getElementById('modal-title').textContent = '質問を編集';
+          document.getElementById('question-text').value = data.text;
+          
+          // 選択肢のデータをセット
+          data.options.forEach(option => {
+            const idLower = option.id.toLowerCase();
+            document.getElementById(`option${option.id}-text`).value = option.text;
+            document.getElementById(`option${option.id}-image`).value = option.image;
+            
+            // プレビューも更新
+            const previewDiv = document.getElementById(`preview-option${option.id}`);
+            updateImagePreview(previewDiv, option.image);
+          });
+        })
+        .catch(error => {
+          console.error('エラー:', error);
+          alert('質問データの取得に失敗しました。');
+          
+          // フォールバックとして簡易データを使用
+          document.getElementById('modal-title').textContent = '質問を編集';
+          document.getElementById('question-text').value = questionText;
+          ['A', 'B', 'C', 'D'].forEach(letter => {
+            document.getElementById(`option${letter}-text`).value = `選択肢${letter}`;
+            document.getElementById(`option${letter}-image`).value = '';
+            
+            // 空のプレビューを表示
+            const previewDiv = document.getElementById(`preview-option${letter}`);
+            updateImagePreview(previewDiv, '');
+          });
+        });
       
       questionModal.style.display = 'block';
     });
