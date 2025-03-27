@@ -179,12 +179,66 @@
 /* 画像プレビュー */
 .image-input-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 15px;
 }
 
-.image-input-container input {
+.file-input-group {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.file-input-group input[type="text"] {
+  width: 100%;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.upload-btn {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #7c4dff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+.upload-btn:hover {
+  background-color: #6a3de8;
+}
+
+.file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.upload-status {
+  margin-top: 5px;
+  font-size: 12px;
+  height: 15px;
+}
+
+.upload-status.success {
+  color: #4caf50;
+}
+
+.upload-status.error {
+  color: #f44336;
+}
+
+.upload-status.loading {
+  color: #ff9800;
 }
 
 .image-preview {

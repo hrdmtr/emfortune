@@ -139,11 +139,18 @@
             <input type="text" id="optionA-text" name="optionA_text" required>
           </div>
           <div class="form-group">
-            <label for="optionA-image">画像パス</label>
+            <label for="optionA-image">画像</label>
             <div class="image-input-container">
-              <input type="text" id="optionA-image" name="optionA_image" placeholder="/images/questions/example.png" required>
+              <div class="file-input-group">
+                <input type="text" id="optionA-image" name="optionA_image" placeholder="/uploads/questions/example.png" required>
+                <div class="upload-actions">
+                  <label class="upload-btn" for="optionA-file">画像を選択</label>
+                  <input type="file" id="optionA-file" class="file-input" accept="image/*" data-target="optionA-image">
+                </div>
+              </div>
               <div class="image-preview" id="preview-optionA"></div>
             </div>
+            <div class="upload-status" id="status-optionA"></div>
           </div>
         </div>
         
@@ -155,11 +162,18 @@
             <input type="text" id="optionB-text" name="optionB_text" required>
           </div>
           <div class="form-group">
-            <label for="optionB-image">画像パス</label>
+            <label for="optionB-image">画像</label>
             <div class="image-input-container">
-              <input type="text" id="optionB-image" name="optionB_image" placeholder="/images/questions/example.png" required>
+              <div class="file-input-group">
+                <input type="text" id="optionB-image" name="optionB_image" placeholder="/uploads/questions/example.png" required>
+                <div class="upload-actions">
+                  <label class="upload-btn" for="optionB-file">画像を選択</label>
+                  <input type="file" id="optionB-file" class="file-input" accept="image/*" data-target="optionB-image">
+                </div>
+              </div>
               <div class="image-preview" id="preview-optionB"></div>
             </div>
+            <div class="upload-status" id="status-optionB"></div>
           </div>
         </div>
         
@@ -171,11 +185,18 @@
             <input type="text" id="optionC-text" name="optionC_text" required>
           </div>
           <div class="form-group">
-            <label for="optionC-image">画像パス</label>
+            <label for="optionC-image">画像</label>
             <div class="image-input-container">
-              <input type="text" id="optionC-image" name="optionC_image" placeholder="/images/questions/example.png" required>
+              <div class="file-input-group">
+                <input type="text" id="optionC-image" name="optionC_image" placeholder="/uploads/questions/example.png" required>
+                <div class="upload-actions">
+                  <label class="upload-btn" for="optionC-file">画像を選択</label>
+                  <input type="file" id="optionC-file" class="file-input" accept="image/*" data-target="optionC-image">
+                </div>
+              </div>
               <div class="image-preview" id="preview-optionC"></div>
             </div>
+            <div class="upload-status" id="status-optionC"></div>
           </div>
         </div>
         
@@ -187,11 +208,18 @@
             <input type="text" id="optionD-text" name="optionD_text" required>
           </div>
           <div class="form-group">
-            <label for="optionD-image">画像パス</label>
+            <label for="optionD-image">画像</label>
             <div class="image-input-container">
-              <input type="text" id="optionD-image" name="optionD_image" placeholder="/images/questions/example.png" required>
+              <div class="file-input-group">
+                <input type="text" id="optionD-image" name="optionD_image" placeholder="/uploads/questions/example.png" required>
+                <div class="upload-actions">
+                  <label class="upload-btn" for="optionD-file">画像を選択</label>
+                  <input type="file" id="optionD-file" class="file-input" accept="image/*" data-target="optionD-image">
+                </div>
+              </div>
               <div class="image-preview" id="preview-optionD"></div>
             </div>
+            <div class="upload-status" id="status-optionD"></div>
           </div>
         </div>
         

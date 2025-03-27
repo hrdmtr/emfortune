@@ -1,6 +1,8 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const { getRandomQuestion, getResult } = require('./utils/dataLoader');
 const { 
   incrementQuestionView, 
@@ -8,6 +10,35 @@ const {
   incrementReferrer,
   getStats 
 } = require('./utils/statsManager');
+
+// ファイルアップロード設定
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'public/uploads/questions/');
+  },
+  filename: function(req, file, cb) {
+    // オリジナルのファイル名を保持しつつ、タイムスタンプを追加して一意にする
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extension = path.extname(file.originalname);
+    cb(null, 'img-' + uniqueSuffix + extension);
+  }
+});
+
+// ファイルフィルター（画像ファイルのみ許可）
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('画像ファイルのみアップロードできます'), false);
+  }
+};
+
+// サイズ制限（1MB）
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 },  // 1MB
+  fileFilter: fileFilter
+});
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -134,6 +165,45 @@ app.get('/admin/question/:id', async (req, res) => {
     console.error('質問データの取得エラー:', error);
     res.status(500).json({ error: '質問データの取得中にエラーが発生しました' });
   }
+});
+
+// 画像アップロードAPI
+app.post('/admin/upload', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'ファイルがアップロードされていません' });
+    }
+    
+    // アップロードされたファイルのパスを返す
+    const filePath = '/uploads/questions/' + req.file.filename;
+    res.json({ 
+      success: true, 
+      filePath: filePath,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+  } catch (error) {
+    console.error('画像アップロードエラー:', error);
+    res.status(500).json({ 
+      error: '画像のアップロード中にエラーが発生しました',
+      message: error.message 
+    });
+  }
+});
+
+// アップロード時のエラーハンドリング
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Multerのエラー処理
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ 
+        error: 'ファイルサイズが大きすぎます', 
+        message: 'アップロードできるのは1MB以下の画像ファイルのみです'
+      });
+    }
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
 });
 
 // サーバーの起動

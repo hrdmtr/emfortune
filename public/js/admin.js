@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const imagePreviewModal = document.getElementById('image-preview-modal');
   const previewModalImage = document.getElementById('preview-modal-image');
   
+  // ファイルアップロード関連
+  const fileInputs = document.querySelectorAll('.file-input');
+  
   // 画像パスのプレビュー機能
   const imageInputs = document.querySelectorAll('input[id$="-image"]');
   imageInputs.forEach(input => {
@@ -49,6 +52,76 @@ document.addEventListener('DOMContentLoaded', function() {
     if (event.target === imagePreviewModal) {
       imagePreviewModal.style.display = 'none';
     }
+  });
+  
+  // ファイルアップロード処理
+  fileInputs.forEach(input => {
+    input.addEventListener('change', function(e) {
+      const targetId = this.getAttribute('data-target');
+      const targetInput = document.getElementById(targetId);
+      const statusEl = document.getElementById('status-' + targetId.replace('-image', ''));
+      
+      if (!this.files || !this.files[0]) {
+        return;
+      }
+      
+      const file = this.files[0];
+      
+      // ファイルサイズチェック (1MB = 1024 * 1024)
+      if (file.size > 1024 * 1024) {
+        statusEl.textContent = 'エラー: ファイルサイズは1MB以下にしてください';
+        statusEl.className = 'upload-status error';
+        return;
+      }
+      
+      // ファイルタイプチェック
+      if (!file.type.startsWith('image/')) {
+        statusEl.textContent = 'エラー: 画像ファイルのみアップロードできます';
+        statusEl.className = 'upload-status error';
+        return;
+      }
+      
+      // フォームデータ作成
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      // ステータスを「アップロード中」に更新
+      statusEl.textContent = 'アップロード中...';
+      statusEl.className = 'upload-status loading';
+      
+      // アップロードリクエスト
+      fetch('/admin/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('アップロードに失敗しました');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // アップロード成功
+          targetInput.value = data.filePath;
+          updateImagePreview(document.getElementById('preview-' + targetId.replace('-image', '')), data.filePath);
+          statusEl.textContent = 'アップロード完了: ' + data.originalName;
+          statusEl.className = 'upload-status success';
+          
+          // 数秒後にステータスメッセージをクリア
+          setTimeout(() => {
+            statusEl.textContent = '';
+          }, 5000);
+        } else {
+          throw new Error(data.error || 'アップロードに失敗しました');
+        }
+      })
+      .catch(error => {
+        console.error('アップロードエラー:', error);
+        statusEl.textContent = 'エラー: ' + (error.message || 'アップロードに失敗しました');
+        statusEl.className = 'upload-status error';
+      });
+    });
   });
   
   // 画像プレビューを更新する関数
