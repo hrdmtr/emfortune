@@ -12,3 +12,16 @@ services:
         value: 10000
       - key: SESSION_SECRET
         generateValue: true
+      - key: TWITTER_CLIENT_ID
+        sync: false  # Renderダッシュボードで手動設定
+      - key: TWITTER_CLIENT_SECRET
+        sync: false  # Renderダッシュボードで手動設定
+      - key: TWITTER_CONSUMER_KEY
+        sync: false  # 従来のAPI用（バックアップ）
+      - key: TWITTER_CONSUMER_SECRET
+        sync: false  # 従来のAPI用（バックアップ）
+      - key: ADMIN_TWITTER_ID
+        value: hrDMInStroke
+      # 本番環境では管理画面のアクセス制限を有効化（true=制限あり、false=制限なし）
+      - key: ENABLE_ADMIN_AUTH
+        value: true

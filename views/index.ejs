@@ -22,7 +22,13 @@
       </div>
     </main>
     <footer>
-      <p>&copy; 2025 EMFortune</p>
+      <p>&copy; 2025 EMFortune | 
+      <% if (typeof enableAdminAuth !== 'undefined' && enableAdminAuth === true) { %>
+        <a href="/auth/twitter" class="admin-link">管理者ログイン</a>
+      <% } else { %>
+        <a href="/admin" class="admin-link">管理画面</a>
+      <% } %>
+      </p>
     </footer>
   </div>
   <script src="/js/main.js"></script>

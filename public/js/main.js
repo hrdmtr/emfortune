@@ -11,6 +11,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
   }
   
+  // 選択肢の画像が読み込めない場合のフォールバック処理
+  const optionImages = document.querySelectorAll('.option-image');
+  optionImages.forEach(imageDiv => {
+    // 現在の背景画像URLを取得
+    const bgImage = getComputedStyle(imageDiv).backgroundImage;
+    if (bgImage === 'none' || !bgImage) {
+      // 背景画像が設定されていない場合はデフォルト画像を設定
+      const defaultImage = `/images/${imageDiv.classList.contains('option-a') ? 'option-a.png' : 
+                              imageDiv.classList.contains('option-b') ? 'option-b.png' : 
+                              imageDiv.classList.contains('option-c') ? 'option-c.png' : 
+                              'option-d.png'}`;
+      imageDiv.style.backgroundImage = `url(${defaultImage})`;
+      imageDiv.style.backgroundSize = 'contain';
+      imageDiv.style.backgroundPosition = 'center';
+    } else {
+      // 画像の読み込みテスト
+      const url = bgImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+      const img = new Image();
+      img.onerror = function() {
+        // 画像が読み込めない場合はデフォルト画像を設定
+        console.log('画像の読み込みに失敗しました:', url);
+        const optionType = imageDiv.classList.contains('option-a') ? 'a' : 
+                          imageDiv.classList.contains('option-b') ? 'b' : 
+                          imageDiv.classList.contains('option-c') ? 'c' : 'd';
+        const defaultImage = `/images/option-${optionType}.png`;
+        imageDiv.style.backgroundImage = `url(${defaultImage})`;
+        
+        // 背景サイズとポジションを適切に設定
+        imageDiv.style.backgroundSize = 'contain';
+        imageDiv.style.backgroundPosition = 'center';
+      };
+      img.src = url;
+    }
+  });
+  
   // 質問ページの選択肢がクリックされたときの効果
   const optionLabels = document.querySelectorAll('.option-label');
   optionLabels.forEach(label => {

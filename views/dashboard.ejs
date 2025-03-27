@@ -116,6 +116,14 @@
       
       <div class="back-link">
         <a href="/" class="link-btn">アプリトップに戻る</a>
+        <% if (typeof enableAdminAuth !== 'undefined' && enableAdminAuth === true) { %>
+          <a href="/auth/logout" class="link-btn">ログアウト</a>
+          <% if (user) { %>
+            <div class="user-info">
+              ログイン中: <%= user.displayName %> (@<%= user.username %>)
+            </div>
+          <% } %>
+        <% } %>
       </div>
     </main>
     <footer>

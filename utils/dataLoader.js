@@ -9,23 +9,39 @@ const loadQuestions = () => {
     fs.createReadStream(path.join(__dirname, '../data/questions/questions.csv'))
       .pipe(csvParser())
       .on('data', (data) => {
+        // 画像パスの修正関数
+        const fixImagePath = (path) => {
+          if (!path || path === '' || path === 'undefined') {
+            return '';
+          }
+          
+          // ""で囲まれている場合は削除
+          if (path.startsWith('"') && path.endsWith('"')) {
+            path = path.substring(1, path.length - 1);
+          }
+          
+          return path;
+        };
+        
         // CSVから読み込んだデータを適切な形式に変換
         const question = {
           id: parseInt(data.id),
           text: data.text,
           options: [
-            { id: 'A', text: data.optionA_text, image: data.optionA_image },
-            { id: 'B', text: data.optionB_text, image: data.optionB_image },
-            { id: 'C', text: data.optionC_text, image: data.optionC_image },
-            { id: 'D', text: data.optionD_text, image: data.optionD_image }
+            { id: 'A', text: data.optionA_text, image: fixImagePath(data.optionA_image) },
+            { id: 'B', text: data.optionB_text, image: fixImagePath(data.optionB_image) },
+            { id: 'C', text: data.optionC_text, image: fixImagePath(data.optionC_image) },
+            { id: 'D', text: data.optionD_text, image: fixImagePath(data.optionD_image) }
           ]
         };
         questions.push(question);
       })
       .on('end', () => {
+        console.log(`${questions.length}件の質問データを読み込みました`);
         resolve(questions);
       })
       .on('error', (error) => {
+        console.error('質問データの読み込みエラー:', error);
         reject(error);
       });
   });

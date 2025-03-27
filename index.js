@@ -3,6 +3,9 @@ const session = require('express-session');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const passport = require('passport');
+require('dotenv').config();
+const { setupAuth, ensureAuthenticated } = require('./utils/auth');
 const { getRandomQuestion, getResult } = require('./utils/dataLoader');
 const { 
   incrementQuestionView, 
@@ -50,17 +53,22 @@ app.set('views', path.join(__dirname, 'views'));
 // ミドルウェアの設定
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // サイズ制限を10MBに増加
+app.use(express.json({ limit: '10mb' })); // JSONリクエストのサイズ制限を10MBに増加
 app.use(session({
   secret: process.env.SESSION_SECRET || 'emfortune-secret-key',
   resave: false,
   saveUninitialized: true,
   cookie: { 
     maxAge: 60 * 60 * 1000, // 1時間
-    secure: process.env.NODE_ENV === 'production'
-  }
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  },
+  proxy: process.env.NODE_ENV === 'production' // プロキシ環境（Render等）で必要
 }));
+
+// 認証設定
+setupAuth(app);
 
 // リファラー情報を収集するミドルウェア
 app.use((req, res, next) => {
@@ -73,7 +81,11 @@ app.use((req, res, next) => {
 
 // ホームページのルート
 app.get('/', (req, res) => {
-  res.render('index', { title: '心理占いアプリ' });
+  const enableAdminAuth = process.env.ENABLE_ADMIN_AUTH !== 'false';
+  res.render('index', { 
+    title: '心理占いアプリ',
+    enableAdminAuth: enableAdminAuth
+  });
 });
 
 // 質問ページのルート
@@ -84,6 +96,25 @@ app.get('/question', async (req, res) => {
     
     // 前回と異なる質問を取得
     const questionData = await getRandomQuestion(previousQuestionId);
+    
+    // 画像パスを確認して修正
+    questionData.options.forEach(option => {
+      // 画像パスのチェックと修正
+      if (!option.image || option.image === '' || option.image === 'undefined') {
+        // デフォルト画像を設定
+        option.image = `/images/option-${option.id.toLowerCase()}.png`;
+      } else if (option.image.startsWith('http://')) {
+        // httpから始まる場合は修正
+        option.image = option.image.replace(/^http:\/\/[^\/]+/, '');
+      }
+      
+      // パスが/で始まっていない場合は修正
+      if (option.image && !option.image.startsWith('/')) {
+        option.image = '/' + option.image;
+      }
+      
+      console.log(`質問 ${questionData.id} の選択肢 ${option.id} の画像パス: ${option.image}`);
+    });
     
     // 今回の質問IDをセッションに保存
     req.session.lastQuestionId = questionData.id;
@@ -114,8 +145,8 @@ app.post('/result', async (req, res) => {
   }
 });
 
-// 管理画面ルート
-app.get('/admin', async (req, res) => {
+// 管理画面ルート（認証必須）
+app.get('/admin', ensureAuthenticated, async (req, res) => {
   try {
     const { loadQuestions, loadResults } = require('./utils/dataLoader');
     const questions = await loadQuestions();
@@ -124,11 +155,16 @@ app.get('/admin', async (req, res) => {
     // 統計情報を取得
     const stats = getStats();
     
+    // 認証設定
+    const enableAdminAuth = process.env.ENABLE_ADMIN_AUTH !== 'false';
+    
     res.render('admin', {
       title: '管理画面',
       questions,
       results,
-      stats
+      stats,
+      user: req.user, // Twitter認証情報をテンプレートに渡す
+      enableAdminAuth: enableAdminAuth
     });
   } catch (error) {
     console.error('管理画面の読み込みエラー:', error);
@@ -136,13 +172,19 @@ app.get('/admin', async (req, res) => {
   }
 });
 
-// ダッシュボード専用ルート
-app.get('/admin/dashboard', (req, res) => {
+// ダッシュボード専用ルート（認証必須）
+app.get('/admin/dashboard', ensureAuthenticated, (req, res) => {
   try {
     const stats = getStats();
+    
+    // 認証設定
+    const enableAdminAuth = process.env.ENABLE_ADMIN_AUTH !== 'false';
+    
     res.render('dashboard', {
       title: 'アクセス統計ダッシュボード',
-      stats
+      stats,
+      user: req.user, // Twitter認証情報をテンプレートに渡す
+      enableAdminAuth: enableAdminAuth
     });
   } catch (error) {
     console.error('ダッシュボードの読み込みエラー:', error);
@@ -150,8 +192,8 @@ app.get('/admin/dashboard', (req, res) => {
   }
 });
 
-// 質問データ取得API
-app.get('/admin/question/:id', async (req, res) => {
+// 質問データ取得API（認証必須）
+app.get('/admin/question/:id', ensureAuthenticated, async (req, res) => {
   try {
     const { loadQuestions } = require('./utils/dataLoader');
     const questionId = parseInt(req.params.id);
@@ -169,8 +211,8 @@ app.get('/admin/question/:id', async (req, res) => {
   }
 });
 
-// 画像アップロードAPI
-app.post('/admin/upload', upload.single('image'), (req, res) => {
+// 画像アップロードAPI（認証必須）
+app.post('/admin/upload', ensureAuthenticated, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'ファイルがアップロードされていません' });
@@ -193,8 +235,8 @@ app.post('/admin/upload', upload.single('image'), (req, res) => {
   }
 });
 
-// 画像トリミングAPI
-app.post('/admin/crop', (req, res) => {
+// 画像トリミングAPI（認証必須）
+app.post('/admin/crop', ensureAuthenticated, (req, res) => {
   try {
     console.log('トリミングリクエスト受信');
     const { imagePath, cropData } = req.body;
@@ -263,8 +305,8 @@ app.post('/admin/crop', (req, res) => {
   }
 });
 
-// 質問保存API
-app.post('/admin/question', async (req, res) => {
+// 質問保存API（認証必須）
+app.post('/admin/question', ensureAuthenticated, async (req, res) => {
   try {
     const { saveQuestion } = require('./utils/dataLoader');
     const questionData = req.body;
@@ -293,8 +335,8 @@ app.post('/admin/question', async (req, res) => {
   }
 });
 
-// 質問削除API
-app.delete('/admin/question/:id', async (req, res) => {
+// 質問削除API（認証必須）
+app.delete('/admin/question/:id', ensureAuthenticated, async (req, res) => {
   try {
     const { deleteQuestion } = require('./utils/dataLoader');
     const questionId = req.params.id;
@@ -324,6 +366,8 @@ app.delete('/admin/question/:id', async (req, res) => {
 
 // アップロード時のエラーハンドリング
 app.use((err, req, res, next) => {
+  console.error('エラーハンドリングミドルウェア:', err);
+  
   if (err instanceof multer.MulterError) {
     // Multerのエラー処理
     if (err.code === 'LIMIT_FILE_SIZE') {
@@ -334,6 +378,16 @@ app.use((err, req, res, next) => {
     }
     return res.status(400).json({ error: err.message });
   }
+  
+  // request entityエラーの処理
+  if (err.type === 'entity.too.large' || err.message?.includes('request entity too large')) {
+    console.error('リクエストが大きすぎます:', err);
+    return res.status(413).json({
+      error: 'リクエストが大きすぎます',
+      message: '画像サイズが大きすぎます。より小さな画像を選択するか、小さな範囲でトリミングしてください。'
+    });
+  }
+  
   next(err);
 });
 

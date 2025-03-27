@@ -22,10 +22,14 @@
   "dependencies": {
     "cropperjs": "^2.0.0",
     "csv-parser": "^3.2.0",
+    "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "passport": "^0.7.0",
+    "passport-twitter": "^1.0.4",
+    "passport-twitter-oauth2": "^2.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

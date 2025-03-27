@@ -141,10 +141,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     try {
       console.log('クロップデータを取得中...');
+      // 画像サイズを計算
+      const cropBoxData = cropper.getCropBoxData();
+      const cropWidth = cropBoxData.width;
+      const cropHeight = cropBoxData.height;
+      console.log('選択領域のサイズ:', cropWidth, 'x', cropHeight);
+      
+      // 大きな画像の場合は適切に縮小
+      const maxDimension = 800; // 最大幅/高さ
+      let targetWidth = cropWidth;
+      let targetHeight = cropHeight;
+      
+      // 元のアスペクト比を維持しながら縮小
+      if (cropWidth > maxDimension || cropHeight > maxDimension) {
+        console.log('大きな画像を検出、リサイズします');
+        if (cropWidth > cropHeight) {
+          targetWidth = maxDimension;
+          targetHeight = (cropHeight / cropWidth) * maxDimension;
+        } else {
+          targetHeight = maxDimension;
+          targetWidth = (cropWidth / cropHeight) * maxDimension;
+        }
+        console.log('リサイズ後のサイズ:', targetWidth, 'x', targetHeight);
+      }
+      
       // クロップデータをBase64形式で取得
       const canvas = cropper.getCroppedCanvas({
-        maxWidth: 800,      // 最大幅
-        maxHeight: 800,     // 最大高さ
+        width: Math.round(targetWidth),
+        height: Math.round(targetHeight),
+        maxWidth: maxDimension,      // 最大幅
+        maxHeight: maxDimension,     // 最大高さ
         fillColor: '#fff',  // 背景色
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high'
@@ -157,7 +183,18 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       console.log('クロップキャンバスが取得できました、データURLに変換中...');
-      const cropData = canvas.toDataURL('image/jpeg', 0.9); // 90%品質のJPEG
+      
+      // 画像の品質を調整（大きな画像ほど圧縮率を上げる）
+      let quality = 0.9; // デフォルトの品質
+      const originalArea = cropWidth * cropHeight;
+      if (originalArea > 1000000) { // 100万ピクセル以上（約1000x1000）
+        quality = 0.7; // より高い圧縮率
+      } else if (originalArea > 250000) { // 25万ピクセル以上（約500x500）
+        quality = 0.8; // 中程度の圧縮率
+      }
+      
+      console.log('使用する画像品質:', quality);
+      const cropData = canvas.toDataURL('image/jpeg', quality);
       console.log('データURLの長さ:', cropData.length);
       
       console.log('サーバーにクロップデータを送信中...');
@@ -177,7 +214,13 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(response => {
         console.log('サーバーからのレスポンス:', response.status);
         if (!response.ok) {
-          throw new Error('サーバーからエラーレスポンス: ' + response.status);
+          return response.json().then(errorData => {
+            // エラーレスポンスからデータを抽出してエラーを投げる
+            throw new Error(errorData.message || 'サーバーからエラーレスポンス: ' + response.status);
+          }).catch(jsonError => {
+            // JSON解析に失敗した場合は一般的なエラーメッセージ
+            throw new Error('サーバーからエラーレスポンス: ' + response.status);
+          });
         }
         return response.json();
       })
