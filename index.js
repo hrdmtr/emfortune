@@ -152,6 +152,7 @@ app.get('/admin/dashboard', (req, res) => {
 // 質問データ取得API
 app.get('/admin/question/:id', async (req, res) => {
   try {
+    const { loadQuestions } = require('./utils/dataLoader');
     const questionId = parseInt(req.params.id);
     const questions = await loadQuestions();
     const question = questions.find(q => q.id === questionId);
