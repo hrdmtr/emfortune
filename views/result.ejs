@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>EMFortune 心理占いアプリ</h1>
+    </header>
+    <main>
+      <div class="result-section">
+        <h2>診断結果</h2>
+        <div class="result-type">
+          <h3><%= result.personality %></h3>
+        </div>
+        <div class="result-description">
+          <p><%= result.description %></p>
+        </div>
+        <div class="compatibility-section">
+          <h3>仕事との相性</h3>
+          <p><%= result.workCompatibility %></p>
+          
+          <h3>人間関係の相性</h3>
+          <p><%= result.relationshipCompatibility %></p>
+        </div>
+        <div class="share-section">
+          <h3>結果をシェアする</h3>
+          <div class="share-buttons">
+            <a href="https://twitter.com/intent/tweet?text=私は「<%= result.personality %>」でした！あなたも試してみませんか？&url=https://emfortune.example.com" target="_blank" class="twitter-share">Twitterでシェア</a>
+          </div>
+        </div>
+        <div class="retry-button-container">
+          <a href="/question" class="retry-button">もう一度占う</a>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2025 EMFortune</p>
+    </footer>
+  </div>
+  <script src="/js/main.js"></script>
+</body>
+</html>

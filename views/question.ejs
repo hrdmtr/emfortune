@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>EMFortune 心理占いアプリ</h1>
+    </header>
+    <main>
+      <div class="question-section">
+        <h2>質問</h2>
+        <div class="question-text">
+          <p><%= questionData.text %></p>
+        </div>
+        <form action="/result" method="post" class="options-container">
+          <% questionData.options.forEach(option => { %>
+            <div class="option-item">
+              <input type="radio" id="<%= option.id %>" name="answer" value="<%= option.id %>" required>
+              <label for="<%= option.id %>" class="option-label">
+                <div class="option-image" style="background-image: url('<%= option.image %>');"></div>
+                <div class="option-text"><%= option.text %></div>
+              </label>
+            </div>
+          <% }); %>
+          <div class="submit-container">
+            <button type="submit" class="submit-button">結果を見る</button>
+          </div>
+        </form>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2025 EMFortune</p>
+    </footer>
+  </div>
+  <script src="/js/main.js"></script>
+</body>
+</html>
