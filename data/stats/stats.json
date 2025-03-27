@@ -1,28 +1,28 @@
 {
   "questions": {
-    "total": 19,
+    "total": 22,
     "byId": {
       "1": 9,
-      "2": 2,
-      "3": 3,
-      "5": 2,
+      "2": 3,
+      "3": 4,
+      "5": 3,
       "6": 1,
       "7": 2
     }
   },
   "results": {
-    "total": 1,
+    "total": 6,
     "byType": {
       "A": 1,
-      "B": 0,
-      "C": 0,
+      "B": 3,
+      "C": 2,
       "D": 0
     }
   },
   "sources": {
     "direct": 5,
     "twitter": 0,
-    "other": 19
+    "other": 22
   },
-  "lastUpdated": "2025-03-27T21:44:24.512Z"
+  "lastUpdated": "2025-03-27T21:51:24.262Z"
 }
