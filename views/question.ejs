@@ -22,7 +22,7 @@
             <div class="option-item">
               <input type="radio" id="<%= option.id %>" name="answer" value="<%= option.id %>" required>
               <label for="<%= option.id %>" class="option-label">
-                <div class="option-image" style="background-image: url('<%= option.image %>');"></div>
+                <div class="option-image <%= option.id === 'A' ? 'option-a' : option.id === 'B' ? 'option-b' : option.id === 'C' ? 'option-c' : 'option-d' %>" style="background-image: url('/images/questions/question-full.png');"></div>
                 <div class="option-text"><%= option.text %></div>
               </label>
             </div>

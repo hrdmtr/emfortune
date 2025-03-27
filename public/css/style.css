@@ -127,13 +127,29 @@ footer {
 
 .option-image {
   height: 160px;
-  background-size: contain;
-  background-position: center;
+  background-size: 400%;
   background-repeat: no-repeat;
   border-radius: 6px;
   margin-bottom: 10px;
   background-color: #f8f5ff;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 4つの選択肢に対応する画像位置 */
+.option-a {
+  background-position: 0% 0%; /* 左上 */
+}
+
+.option-b {
+  background-position: 100% 0%; /* 右上 */
+}
+
+.option-c {
+  background-position: 0% 100%; /* 左下 */
+}
+
+.option-d {
+  background-position: 100% 100%; /* 右下 */
 }
 
 .option-label:hover .option-image {
