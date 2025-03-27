@@ -55,12 +55,24 @@ const loadResults = () => {
   });
 };
 
-// ランダムな質問を取得
-const getRandomQuestion = async () => {
+// ランダムな質問を取得（前回と異なる質問を返す）
+const getRandomQuestion = async (previousId = null) => {
   try {
     const questions = await loadQuestions();
-    const randomIndex = Math.floor(Math.random() * questions.length);
-    return questions[randomIndex];
+    
+    // 質問が1つしかない場合はその質問を返す
+    if (questions.length === 1) {
+      return questions[0];
+    }
+    
+    // 前回と異なる質問を選ぶ
+    let availableQuestions = questions;
+    if (previousId !== null) {
+      availableQuestions = questions.filter(q => q.id !== previousId);
+    }
+    
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    return availableQuestions[randomIndex];
   } catch (error) {
     console.error('質問データの読み込みエラー:', error);
     // エラー時のフォールバック質問

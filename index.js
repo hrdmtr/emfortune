@@ -47,7 +47,14 @@ app.get('/', (req, res) => {
 // 質問ページのルート
 app.get('/question', async (req, res) => {
   try {
-    const questionData = await getRandomQuestion();
+    // セッションから前回の質問IDを取得
+    const previousQuestionId = req.session.lastQuestionId || null;
+    
+    // 前回と異なる質問を取得
+    const questionData = await getRandomQuestion(previousQuestionId);
+    
+    // 今回の質問IDをセッションに保存
+    req.session.lastQuestionId = questionData.id;
     
     // 質問表示の統計を記録
     incrementQuestionView(questionData.id);
