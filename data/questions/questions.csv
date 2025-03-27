@@ -1,5 +1,5 @@
 id,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image
-1,休日の過ごし方として、最も魅力的なのはどれですか？,友達と賑やかに過ごす,/images/option-a.png,自然の中でリラックス,/images/option-b.png,新しい場所を探検する,/images/option-c.png,家でゆっくり過ごす,/images/option-d.png
-2,プレゼントを選ぶとき、あなたが最も重視するのは？,驚きと感動を与えられるか,/images/gift-a.png,実用性と便利さ,/images/gift-b.png,趣味や好みに合っているか,/images/gift-c.png,美しさや見た目の良さ,/images/gift-d.png
-3,困っている人を見かけたとき、あなたはどうする？,すぐに声をかけて手助けする,/images/help-a.png,どんな助けが必要か観察してから行動する,/images/help-b.png,他に手伝える人がいないか探す,/images/help-c.png,相手が助けを求めるのを待つ,/images/help-d.png
-4,新しい環境で仕事をするとき、最初にすることは？,みんなと積極的に交流する,/images/work-a.png,自分の役割や仕事の内容を明確にする,/images/work-b.png,環境や状況を観察して把握する,/images/work-c.png,必要な情報や資料を集める,/images/work-d.png
+1,休日の過ごし方として、最も魅力的なのはどれですか？,友達と賑やかに過ごす,/images/questions/friends-social.png,自然の中でリラックス,/images/questions/nature-relax.png,新しい場所を探検する,/images/questions/adventure-explore.png,家でゆっくり過ごす,/images/questions/home-chill.png
+2,プレゼントを選ぶとき、あなたが最も重視するのは？,驚きと感動を与えられるか,/images/questions/gift-surprise.png,実用性と便利さ,/images/questions/gift-practical.png,趣味や好みに合っているか,/images/questions/gift-personal.png,美しさや見た目の良さ,/images/questions/gift-beautiful.png
+3,困っている人を見かけたとき、あなたはどうする？,すぐに声をかけて手助けする,/images/questions/help-immediate.png,どんな助けが必要か観察してから行動する,/images/questions/help-observe.png,他に手伝える人がいないか探す,/images/questions/help-delegate.png,相手が助けを求めるのを待つ,/images/questions/help-wait.png
+4,新しい環境で仕事をするとき、最初にすることは？,みんなと積極的に交流する,/images/questions/work-social.png,自分の役割や仕事の内容を明確にする,/images/questions/work-role.png,環境や状況を観察して把握する,/images/questions/work-observe.png,必要な情報や資料を集める,/images/questions/work-research.png

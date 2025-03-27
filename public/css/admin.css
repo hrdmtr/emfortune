@@ -176,6 +176,28 @@
   font-size: 14px;
 }
 
+/* 画像プレビュー */
+.image-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-input-container input {
+  flex: 1;
+}
+
+.image-preview {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f8f5ff;
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;

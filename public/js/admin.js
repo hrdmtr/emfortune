@@ -4,6 +4,25 @@ document.addEventListener('DOMContentLoaded', function() {
   const resultModal = document.getElementById('result-modal');
   const closeButtons = document.querySelectorAll('.close, .modal-cancel');
   
+  // 画像パスのプレビュー機能
+  const imageInputs = document.querySelectorAll('input[id$="-image"]');
+  imageInputs.forEach(input => {
+    const previewId = 'preview-' + input.id.replace('-image', '');
+    const previewDiv = document.getElementById(previewId);
+    
+    if (previewDiv) {
+      // 初期値があればプレビューに表示
+      if (input.value) {
+        previewDiv.style.backgroundImage = `url(${input.value})`;
+      }
+      
+      // 入力が変更されたらプレビューを更新
+      input.addEventListener('input', function() {
+        previewDiv.style.backgroundImage = input.value ? `url(${input.value})` : 'none';
+      });
+    }
+  });
+  
   // 質問追加ボタン
   const addQuestionBtn = document.getElementById('add-question-btn');
   

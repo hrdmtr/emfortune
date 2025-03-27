@@ -111,21 +111,34 @@ footer {
 .option-label {
   display: block;
   cursor: pointer;
-  padding: 10px;
+  padding: 15px;
   border: 2px solid #ddd;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: all 0.3s;
   height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.option-label:hover {
+  border-color: #9d78ff;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .option-image {
   height: 160px;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 6px;
   margin-bottom: 10px;
-  background-color: #f0f0f0;
+  background-color: #f8f5ff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.option-label:hover .option-image {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(124, 77, 255, 0.2);
 }
 
 .option-text {
@@ -135,7 +148,19 @@ footer {
 
 .option-item input[type="radio"]:checked + .option-label {
   border-color: #7c4dff;
-  box-shadow: 0 0 0 2px #7c4dff;
+  box-shadow: 0 0 0 2px #7c4dff, 0 5px 15px rgba(124, 77, 255, 0.2);
+  background-color: #f8f5ff;
+}
+
+/* 選択時のアニメーション効果 */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(124, 77, 255, 0.4), 0 5px 15px rgba(124, 77, 255, 0.2); }
+  70% { box-shadow: 0 0 0 10px rgba(124, 77, 255, 0), 0 5px 15px rgba(124, 77, 255, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 77, 255, 0), 0 5px 15px rgba(124, 77, 255, 0.2); }
+}
+
+.option-item input[type="radio"]:checked + .option-label {
+  animation: pulse 1.5s infinite;
 }
 
 .submit-container {
