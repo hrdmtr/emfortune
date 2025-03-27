@@ -31,6 +31,124 @@ const loadQuestions = () => {
   });
 };
 
+// 質問データの保存
+const saveQuestion = async (questionData) => {
+  try {
+    // 既存の質問を読み込む
+    const questions = await loadQuestions();
+    let isNewQuestion = true;
+    let maxId = 0;
+    
+    // 最大IDを取得し、既存の質問かどうかを確認
+    questions.forEach(question => {
+      maxId = Math.max(maxId, question.id);
+      if (questionData.id && question.id === parseInt(questionData.id)) {
+        // 既存の質問を更新
+        question.text = questionData.text;
+        question.options[0].text = questionData.optionA_text;
+        question.options[0].image = questionData.optionA_image;
+        question.options[1].text = questionData.optionB_text;
+        question.options[1].image = questionData.optionB_image;
+        question.options[2].text = questionData.optionC_text;
+        question.options[2].image = questionData.optionC_image;
+        question.options[3].text = questionData.optionD_text;
+        question.options[3].image = questionData.optionD_image;
+        isNewQuestion = false;
+      }
+    });
+    
+    // 新しい質問の場合は追加
+    if (isNewQuestion) {
+      const newQuestion = {
+        id: questionData.id ? parseInt(questionData.id) : maxId + 1,
+        text: questionData.text,
+        options: [
+          { id: 'A', text: questionData.optionA_text, image: questionData.optionA_image },
+          { id: 'B', text: questionData.optionB_text, image: questionData.optionB_image },
+          { id: 'C', text: questionData.optionC_text, image: questionData.optionC_image },
+          { id: 'D', text: questionData.optionD_text, image: questionData.optionD_image }
+        ]
+      };
+      questions.push(newQuestion);
+    }
+    
+    // 質問データをCSVに変換
+    const header = 'id,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image\n';
+    const rows = questions.map(q => {
+      return [
+        q.id,
+        q.text,
+        q.options[0].text,
+        q.options[0].image,
+        q.options[1].text,
+        q.options[1].image,
+        q.options[2].text,
+        q.options[2].image,
+        q.options[3].text,
+        q.options[3].image
+      ].map(value => `"${String(value).replace(/"/g, '""')}"`).join(',');
+    }).join('\n');
+    
+    // CSVファイルに保存
+    const csvContent = header + rows;
+    await fs.promises.writeFile(
+      path.join(__dirname, '../data/questions/questions.csv'),
+      csvContent
+    );
+    
+    return isNewQuestion ? { success: true, isNew: true } : { success: true, isNew: false };
+  } catch (error) {
+    console.error('質問データ保存エラー:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// 質問データの削除
+const deleteQuestion = async (questionId) => {
+  try {
+    // 既存の質問を読み込む
+    const questions = await loadQuestions();
+    const initialCount = questions.length;
+    
+    // 指定されたIDの質問を除外する
+    const filteredQuestions = questions.filter(q => q.id !== parseInt(questionId));
+    
+    // 質問が見つからなかった場合
+    if (filteredQuestions.length === initialCount) {
+      return { success: false, error: '指定された質問が見つかりません' };
+    }
+    
+    // 質問データをCSVに変換
+    const header = 'id,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image\n';
+    const rows = filteredQuestions.map(q => {
+      return [
+        q.id,
+        q.text,
+        q.options[0].text,
+        q.options[0].image,
+        q.options[1].text,
+        q.options[1].image,
+        q.options[2].text,
+        q.options[2].image,
+        q.options[3].text,
+        q.options[3].image
+      ].map(value => `"${String(value).replace(/"/g, '""')}"`).join(',');
+    }).join('\n');
+    
+    // CSVファイルに保存
+    const csvContent = header + rows;
+    await fs.promises.writeFile(
+      path.join(__dirname, '../data/questions/questions.csv'),
+      csvContent
+    );
+    
+    return { success: true };
+  } catch (error) {
+    console.error('質問データ削除エラー:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 // 診断結果データの読み込み
 const loadResults = () => {
   return new Promise((resolve, reject) => {
@@ -114,5 +232,7 @@ module.exports = {
   loadQuestions,
   loadResults,
   getRandomQuestion,
-  getResult
+  getResult,
+  saveQuestion,
+  deleteQuestion
 };

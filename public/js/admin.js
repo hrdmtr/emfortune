@@ -187,6 +187,9 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('modal-title').textContent = '質問を追加';
       document.getElementById('question-form').reset();
       
+      // 質問IDを空にする（新規追加モード）
+      document.getElementById('question-id').value = '';
+      
       // すべてのプレビューを空の状態に更新
       ['A', 'B', 'C', 'D'].forEach(letter => {
         const previewDiv = document.getElementById(`preview-option${letter}`);
@@ -223,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
           // 取得したデータをフォームにセット
           document.getElementById('modal-title').textContent = '質問を編集';
+          document.getElementById('question-id').value = data.id; // 質問IDをセット
           document.getElementById('question-text').value = data.text;
           
           // 選択肢のデータをセット
@@ -281,11 +285,40 @@ document.addEventListener('DOMContentLoaded', function() {
   deleteQuestionBtns.forEach(button => {
     button.addEventListener('click', function() {
       const questionId = this.getAttribute('data-id');
+      const row = this.closest('tr');
+      
       if (confirm('この質問を削除してもよろしいですか？')) {
-        // 本来はここでサーバーへ削除リクエストを送信
-        console.log('質問ID ' + questionId + ' を削除します');
-        // 成功したら行を削除
-        this.closest('tr').remove();
+        // 削除中の状態表示
+        button.textContent = '削除中...';
+        button.disabled = true;
+        
+        // サーバーに削除リクエストを送信
+        fetch(`/admin/question/${questionId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('サーバーエラー: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // 成功したら行を削除
+            row.remove();
+            alert('質問が削除されました');
+          } else {
+            throw new Error(data.error || '不明なエラーが発生しました');
+          }
+        })
+        .catch(error => {
+          console.error('質問削除エラー:', error);
+          alert('質問の削除に失敗しました: ' + error.message);
+          
+          // ボタンを元に戻す
+          button.textContent = '削除';
+          button.disabled = false;
+        });
       }
     });
   });
@@ -304,14 +337,48 @@ document.addEventListener('DOMContentLoaded', function() {
         questionData[key] = value;
       }
       
-      // 本来はここでサーバーへ送信
-      console.log('質問データを送信:', questionData);
+      // 送信中の状態表示
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.textContent;
+      submitButton.textContent = '保存中...';
+      submitButton.disabled = true;
       
-      // モーダルを閉じる
-      questionModal.style.display = 'none';
-      
-      // 成功したら通知
-      alert('質問が保存されました');
+      // サーバーへ送信
+      fetch('/admin/question', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(questionData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('サーバーエラー: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // モーダルを閉じる
+          questionModal.style.display = 'none';
+          
+          // 保存成功の通知
+          alert(data.message);
+          
+          // ページをリロードして更新された質問一覧を表示
+          window.location.reload();
+        } else {
+          throw new Error(data.error || '不明なエラーが発生しました');
+        }
+      })
+      .catch(error => {
+        console.error('質問保存エラー:', error);
+        alert('質問の保存に失敗しました: ' + error.message);
+        
+        // ボタンを元に戻す
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+      });
     });
   }
   

@@ -191,6 +191,65 @@ app.post('/admin/upload', upload.single('image'), (req, res) => {
   }
 });
 
+// 質問保存API
+app.post('/admin/question', async (req, res) => {
+  try {
+    const { saveQuestion } = require('./utils/dataLoader');
+    const questionData = req.body;
+    
+    // 質問データの保存
+    const result = await saveQuestion(questionData);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        isNew: result.isNew,
+        message: result.isNew ? '新しい質問が追加されました' : '質問が更新されました'
+      });
+    } else {
+      res.status(500).json({ 
+        error: '質問の保存中にエラーが発生しました',
+        message: result.error
+      });
+    }
+  } catch (error) {
+    console.error('質問保存エラー:', error);
+    res.status(500).json({ 
+      error: '質問の保存中にエラーが発生しました', 
+      message: error.message 
+    });
+  }
+});
+
+// 質問削除API
+app.delete('/admin/question/:id', async (req, res) => {
+  try {
+    const { deleteQuestion } = require('./utils/dataLoader');
+    const questionId = req.params.id;
+    
+    // 質問データの削除
+    const result = await deleteQuestion(questionId);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: '質問が削除されました'
+      });
+    } else {
+      res.status(500).json({ 
+        error: '質問の削除中にエラーが発生しました',
+        message: result.error
+      });
+    }
+  } catch (error) {
+    console.error('質問削除エラー:', error);
+    res.status(500).json({ 
+      error: '質問の削除中にエラーが発生しました', 
+      message: error.message 
+    });
+  }
+});
+
 // アップロード時のエラーハンドリング
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {

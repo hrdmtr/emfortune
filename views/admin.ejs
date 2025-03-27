@@ -126,6 +126,8 @@
       <span class="close">&times;</span>
       <h3 id="modal-title">質問を追加</h3>
       <form id="question-form">
+        <!-- 編集時に使用する質問ID (hidden) -->
+        <input type="hidden" id="question-id" name="id">
         <div class="form-group">
           <label for="question-text">質問内容</label>
           <input type="text" id="question-text" name="text" required>
