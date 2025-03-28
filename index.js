@@ -11,6 +11,7 @@ const {
   incrementQuestionView, 
   incrementResultView, 
   incrementReferrer,
+  incrementLike,
   getStats 
 } = require('./utils/statsManager');
 
@@ -389,6 +390,66 @@ app.use((err, req, res, next) => {
   }
   
   next(err);
+});
+
+// サムアップAPI
+app.post('/api/like', async (req, res) => {
+  try {
+    const { resultType } = req.body;
+    
+    // resultTypeが有効かチェック
+    if (!resultType || !['A', 'B', 'C', 'D'].includes(resultType)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '無効な結果タイプです'
+      });
+    }
+    
+    // いいねを増やす
+    const success = incrementLike(resultType);
+    
+    if (success) {
+      // 現在の統計情報を取得
+      const stats = getStats();
+      res.json({
+        success: true,
+        likes: stats.likes.total,
+        message: 'サムアップしました！'
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: '統計情報の更新に失敗しました'
+      });
+    }
+  } catch (error) {
+    console.error('サムアップエラー:', error);
+    res.status(500).json({
+      success: false,
+      error: 'サムアップ処理中にエラーが発生しました'
+    });
+  }
+});
+
+// サムアップ数の取得API
+app.get('/api/likes', (req, res) => {
+  try {
+    const stats = getStats();
+    if (!stats.likes) {
+      stats.likes = { total: 0, byType: { A: 0, B: 0, C: 0, D: 0 } };
+    }
+    
+    res.json({
+      success: true,
+      likes: stats.likes.total
+    });
+  } catch (error) {
+    console.error('いいね数取得エラー:', error);
+    res.status(500).json({
+      success: false,
+      error: 'いいね数の取得中にエラーが発生しました'
+    });
+  }
 });
 
 // サーバーの起動

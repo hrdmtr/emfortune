@@ -264,6 +264,59 @@ footer a.admin-link:hover {
   background-color: #0c85d0;
 }
 
+/* サムアップボタンのスタイル */
+.like-section {
+  margin: 30px 0;
+  text-align: center;
+}
+
+.like-button {
+  background-color: #fff;
+  border: 2px solid #7c4dff;
+  color: #7c4dff;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.like-button:hover {
+  background-color: #f0ebff;
+  transform: translateY(-2px);
+}
+
+.like-button.liked {
+  background-color: #7c4dff;
+  color: white;
+}
+
+.like-icon {
+  font-size: 18px;
+}
+
+.like-message {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #7c4dff;
+}
+
+.likes-count {
+  margin: 10px 0 20px;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  background-color: #f8f5ff;
+  padding: 8px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .retry-button-container {
   text-align: center;
   margin-top: 30px;

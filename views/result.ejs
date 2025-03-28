@@ -33,6 +33,15 @@
             <a href="https://twitter.com/intent/tweet?text=私は「<%= result.personality %>」でした！あなたも試してみませんか？&url=https://emfortune.onrender.com" target="_blank" class="twitter-share">Twitterでシェア</a>
           </div>
         </div>
+        
+        <div class="like-section">
+          <h3>この占い結果はいかがでしたか？</h3>
+          <button id="like-button" data-result="<%= result.type %>" class="like-button">
+            <span class="like-icon">👍</span> 
+            <span class="like-text">役に立った！</span>
+          </button>
+          <p class="like-message" id="like-message" style="display: none;"></p>
+        </div>
         <div class="retry-button-container">
           <a href="/question" class="retry-button">もう一度占う</a>
         </div>

@@ -27,6 +27,15 @@ const loadStats = () => {
           twitter: 0,
           other: 0
         },
+        likes: {
+          total: 0,
+          byType: {
+            A: 0,
+            B: 0,
+            C: 0,
+            D: 0
+          }
+        },
         lastUpdated: new Date().toISOString()
       };
       fs.writeFileSync(STATS_FILE_PATH, JSON.stringify(initialStats, null, 2));
@@ -103,6 +112,34 @@ const incrementReferrer = (referrer) => {
   return saveStats(stats);
 };
 
+// いいね数を増やす
+const incrementLike = (resultType) => {
+  const stats = loadStats();
+  if (!stats) return false;
+  
+  // 合計いいね数を増やす
+  if (!stats.likes) {
+    stats.likes = {
+      total: 0,
+      byType: {
+        A: 0,
+        B: 0,
+        C: 0,
+        D: 0
+      }
+    };
+  }
+  
+  stats.likes.total += 1;
+  
+  // タイプごとのいいね数を増やす
+  if (stats.likes.byType[resultType] !== undefined) {
+    stats.likes.byType[resultType] += 1;
+  }
+  
+  return saveStats(stats);
+};
+
 // 統計情報を取得する
 const getStats = () => {
   return loadStats();
@@ -112,5 +149,6 @@ module.exports = {
   incrementQuestionView,
   incrementResultView,
   incrementReferrer,
+  incrementLike,
   getStats
 };
