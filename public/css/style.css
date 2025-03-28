@@ -444,6 +444,79 @@ footer a.admin-link:hover {
   font-weight: bold;
 }
 
+/* カスタムのクロッパースタイル（Cropper.jsの公式スタイルを補完） */
+.crop-container {
+  max-width: 800px;
+  margin: 20px auto;
+  background: #f8f5ff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.img-container {
+  max-height: 400px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.crop-help {
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  border-left: 4px solid #7c4dff;
+  font-size: 0.9em;
+}
+
+.crop-help p {
+  margin: 0 0 5px 0;
+  font-weight: bold;
+  color: #555;
+}
+
+.crop-help ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.crop-help li {
+  margin-bottom: 3px;
+  color: #666;
+}
+
+.cropper-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cropper-button {
+  background-color: #7c4dff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.cropper-button:hover {
+  background-color: #6a3de8;
+}
+
+.cropper-button.cancel {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.cropper-button.cancel:hover {
+  background-color: #e0e0e0;
+}
+
 /* サムアップボタンのスタイル */
 .like-section {
   margin: 30px 0;

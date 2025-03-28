@@ -14,6 +14,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const cropApplyButton = document.getElementById('crop-apply');
   const cropCancelButton = document.getElementById('crop-cancel');
   
+  // Cropperがグローバルスコープで利用可能か確認
+  if (typeof Cropper === 'undefined') {
+    console.error('Cropper is not defined! Check if Cropper.js is properly loaded.');
+    alert('画像編集機能に必要なライブラリが読み込まれていません。ページを再読み込みしてください。');
+  } else {
+    console.log('Cropper is available:', Cropper.version);
+  }
+  
   // クロッパーのインスタンス
   let cropper = null;
   
