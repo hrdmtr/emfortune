@@ -3,8 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>【質問】<%= questionData.text %> | EMFortune心理占い</title>
+  <meta name="description" content="「<%= questionData.text %>」この質問に答えて、あなたの本当の性格と適性を診断しましょう。EMFortuneは無料で使える心理占いアプリです。">
+  <meta name="keywords" content="<%= questionData.text.replace(/[？！、。]/g, '') %>, 心理占い, 性格診断, 適性テスト">
+  <meta property="og:title" content="【質問】<%= questionData.text %> | EMFortune心理占い">
+  <meta property="og:description" content="この質問に答えて、あなたの性格と適性を診断。無料の心理占いアプリでより深い自己理解を。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= shareUrl %>">
+  <meta property="og:image" content="https://emfortune.onrender.com/images/ogp-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="<%= shareUrl %>">
   <link rel="stylesheet" href="/css/style.css">
+  <!-- 構造化データマークアップ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    "name": "<%= questionData.text %>",
+    "description": "この質問に答えて、あなたの性格と適性を診断します。",
+    "educationalAlignment": {
+      "@type": "AlignmentObject",
+      "alignmentType": "educationalSubject",
+      "targetName": "心理学"
+    },
+    "about": {
+      "@type": "Thing",
+      "name": "性格診断",
+      "description": "質問への回答から、性格タイプや適性を分析します"
+    },
+    "mainEntity": {
+      "@type": "Question",
+      "name": "<%= questionData.text %>",
+      "suggestedAnswer": [
+        <% questionData.options.forEach((option, index) => { %>
+          {
+            "@type": "Answer",
+            "text": "<%= option.text %>"
+          }<%= index < questionData.options.length - 1 ? ',' : '' %>
+        <% }); %>
+      ]
+    }
+  }
+  </script>
 </head>
 <body>
   <div class="container">

@@ -3,8 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title>EMFortune | 心理占いで性格診断 - あなたの本当の姿を知る</title>
+  <meta name="description" content="EMFortuneは、シンプルな質問に答えるだけであなたの性格や適性を診断する心理占いアプリです。職場での適性や対人関係についての洞察を得られます。">
+  <meta name="keywords" content="心理占い, 性格診断, 適性テスト, 心理テスト, 無料">
+  <meta property="og:title" content="EMFortune | 心理占いで性格診断 - あなたの本当の姿を知る">
+  <meta property="og:description" content="シンプルな質問に答えるだけであなたの性格や適性を診断。職場での適性や対人関係についての洞察を得られます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= typeof baseUrl !== 'undefined' ? baseUrl : 'https://emfortune.onrender.com' %>">
+  <meta property="og:image" content="<%= typeof baseUrl !== 'undefined' ? baseUrl : 'https://emfortune.onrender.com' %>/images/ogp-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="<%= typeof baseUrl !== 'undefined' ? baseUrl : 'https://emfortune.onrender.com' %>">
   <link rel="stylesheet" href="/css/style.css">
+  <!-- 構造化データマークアップ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "EMFortune 心理占いアプリ",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Web",
+    "description": "シンプルな質問に答えるだけでユーザーの性格や適性を診断する心理占いアプリケーション",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "url": "<%= typeof baseUrl !== 'undefined' ? baseUrl : 'https://emfortune.onrender.com' %>"
+  }
+  </script>
 </head>
 <body>
   <div class="container">
@@ -16,8 +42,47 @@
         <h2>あなたの本当の姿を占います</h2>
         <p>簡単な質問に答えるだけで、あなたの性格や適性がわかります。</p>
         <p>質問に正直に答えることで、より正確な結果が得られます。</p>
+        
+        <section class="features-section">
+          <h3>EMFortuneでわかること</h3>
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">👔</div>
+              <h4>職業適性</h4>
+              <p>あなたに向いている仕事のタイプを診断します。</p>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🤝</div>
+              <h4>人間関係</h4>
+              <p>相性のよい人のタイプや対人関係の傾向がわかります。</p>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🔍</div>
+              <h4>自己分析</h4>
+              <p>あなたの行動傾向や意思決定パターンを解析します。</p>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">💡</div>
+              <h4>長所・短所</h4>
+              <p>あなたの強みと弱みを明らかにします。</p>
+            </div>
+          </div>
+        </section>
+        
         <div class="start-button-container">
           <a href="/question" class="start-button">占いを始める</a>
+        </div>
+        
+        <div class="testimonials">
+          <h3>ユーザーからの声</h3>
+          <div class="testimonial-item">
+            <p class="testimonial-text">「自分では気づかなかった性格の一面を発見できました。仕事選びの参考になります！」</p>
+            <p class="testimonial-author">30代女性</p>
+          </div>
+          <div class="testimonial-item">
+            <p class="testimonial-text">「友人と一緒にやってみて、お互いの違いが理解できるようになりました。」</p>
+            <p class="testimonial-author">20代男性</p>
+          </div>
         </div>
       </div>
     </main>

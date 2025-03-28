@@ -83,9 +83,16 @@ app.use((req, res, next) => {
 // ホームページのルート
 app.get('/', (req, res) => {
   const enableAdminAuth = process.env.ENABLE_ADMIN_AUTH !== 'false';
+  
+  // SEO対策のために完全なURL情報を生成
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const baseUrl = `${protocol}://${host}`;
+  
   res.render('index', { 
     title: '心理占いアプリ',
-    enableAdminAuth: enableAdminAuth
+    enableAdminAuth: enableAdminAuth,
+    baseUrl: baseUrl
   });
 });
 
