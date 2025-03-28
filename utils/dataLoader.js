@@ -227,19 +227,24 @@ const getRandomQuestion = async (previousId = null) => {
 const getResult = async (answer) => {
   try {
     const results = await loadResults();
-    return results[answer] || {
+    const result = results[answer] || {
       personality: '不明',
       description: '回答が見つかりませんでした。',
       workCompatibility: '情報がありません。',
       relationshipCompatibility: '情報がありません。'
     };
+    
+    // 結果オブジェクトにタイプ（選択肢ID）を追加
+    result.type = answer;
+    return result;
   } catch (error) {
     console.error('結果データの読み込みエラー:', error);
     return {
       personality: 'エラー',
       description: '結果データを読み込めませんでした。',
       workCompatibility: '情報がありません。',
-      relationshipCompatibility: '情報がありません。'
+      relationshipCompatibility: '情報がありません。',
+      type: answer
     };
   }
 };
