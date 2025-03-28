@@ -478,12 +478,32 @@ app.post('/admin/result', ensureAuthenticated, async (req, res) => {
 });
 
 // 質問削除API（認証必須）
-app.delete('/admin/question/:id', ensureAuthenticated, async (req, res) => {
+app.delete('/admin/question/:id', ensureAuthenticated, express.json(), async (req, res) => {
   try {
     const { deleteQuestion } = require('./utils/dataLoader');
     const questionId = req.params.id;
+    const deleteKey = req.body.deleteKey;
     
-    // 質問データの削除
+    // 削除キーの検証（0618に設定）
+    const VALID_DELETE_KEY = '0618';
+    
+    if (!deleteKey) {
+      return res.status(400).json({
+        success: false,
+        error: '削除キーが提供されていません',
+        message: '削除を実行するには削除キーが必要です'
+      });
+    }
+    
+    if (deleteKey !== VALID_DELETE_KEY) {
+      return res.status(403).json({
+        success: false,
+        error: '削除キーが正しくありません',
+        message: '正しい削除キーを入力してください'
+      });
+    }
+    
+    // 正しい削除キーが確認できたら、質問データの削除を実行
     const result = await deleteQuestion(questionId);
     
     if (result.success) {

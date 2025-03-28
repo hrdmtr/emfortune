@@ -633,14 +633,27 @@ document.addEventListener('DOMContentLoaded', function() {
       const questionId = this.getAttribute('data-id');
       const row = this.closest('tr');
       
+      // 削除キーの入力を求める
+      const deleteKey = prompt('削除するには削除キーを入力してください：');
+      
+      // キャンセルされた場合
+      if (deleteKey === null) {
+        return;
+      }
+      
+      // 削除確認
       if (confirm('この質問を削除してもよろしいですか？')) {
         // 削除中の状態表示
         button.textContent = '削除中...';
         button.disabled = true;
         
-        // サーバーに削除リクエストを送信
+        // サーバーに削除リクエストを送信（削除キーを含む）
         fetch(`/admin/question/${questionId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ deleteKey: deleteKey })
         })
         .then(response => {
           if (!response.ok) {
