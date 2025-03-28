@@ -52,7 +52,7 @@
   <script src="/js/main.js"></script>
   <script>
     function shareOnTwitter() {
-      const shareText = encodeURIComponent('EMFortune心理占いアプリでこの質問に答えてみよう！');
+      const shareText = encodeURIComponent('<%= questionData.shareText %>');
       const shareUrl = encodeURIComponent('<%= shareUrl %>');
       window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank');
     }

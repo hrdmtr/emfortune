@@ -237,6 +237,13 @@
   color: #f44336;
 }
 
+.field-help {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
+}
+
 .upload-status.loading {
   color: #ff9800;
 }

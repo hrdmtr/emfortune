@@ -527,6 +527,13 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('question-id').value = data.id; // 質問IDをセット
           document.getElementById('question-text').value = data.text;
           
+          // 共有テキストがあれば設定
+          if (data.shareText) {
+            document.getElementById('share-text').value = data.shareText;
+          } else {
+            document.getElementById('share-text').value = '';
+          }
+          
           // 選択肢のデータをセット
           data.options.forEach(option => {
             const idLower = option.id.toLowerCase();

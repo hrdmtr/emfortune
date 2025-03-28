@@ -32,7 +32,8 @@ const loadQuestions = () => {
             { id: 'B', text: data.optionB_text, image: fixImagePath(data.optionB_image) },
             { id: 'C', text: data.optionC_text, image: fixImagePath(data.optionC_image) },
             { id: 'D', text: data.optionD_text, image: fixImagePath(data.optionD_image) }
-          ]
+          ],
+          shareText: data.share_text || 'EMFortune心理占いアプリでこの質問に答えてみよう！'
         };
         questions.push(question);
       })
@@ -83,13 +84,14 @@ const saveQuestion = async (questionData) => {
           { id: 'B', text: questionData.optionB_text, image: questionData.optionB_image },
           { id: 'C', text: questionData.optionC_text, image: questionData.optionC_image },
           { id: 'D', text: questionData.optionD_text, image: questionData.optionD_image }
-        ]
+        ],
+        shareText: questionData.share_text || 'EMFortune心理占いアプリでこの質問に答えてみよう！'
       };
       questions.push(newQuestion);
     }
     
     // 質問データをCSVに変換
-    const header = 'id,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image\n';
+    const header = 'id,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image,share_text\n';
     const rows = questions.map(q => {
       return [
         q.id,
@@ -101,7 +103,8 @@ const saveQuestion = async (questionData) => {
         q.options[2].text,
         q.options[2].image,
         q.options[3].text,
-        q.options[3].image
+        q.options[3].image,
+        q.shareText || ''
       ].map(value => `"${String(value).replace(/"/g, '""')}"`).join(',');
     }).join('\n');
     
