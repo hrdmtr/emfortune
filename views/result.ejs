@@ -87,6 +87,21 @@
       <form id="question-form">
         <!-- 質問ID (hidden) -->
         <input type="hidden" id="question-id" name="id">
+        
+        <div class="form-group">
+          <label for="question-title">タイトル</label>
+          <input type="text" id="question-title" name="title" placeholder="質問のタイトル（例：お金執着度）" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="question-category">カテゴリー</label>
+          <select id="question-category" name="category" required>
+            <option value="占い">占い</option>
+            <option value="性格診断">性格診断</option>
+            <option value="クイズ">クイズ</option>
+          </select>
+        </div>
+        
         <div class="form-group">
           <label for="question-text">質問内容</label>
           <input type="text" id="question-text" name="text" required>
@@ -210,7 +225,8 @@
     }
     
     .form-group input[type="text"],
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: 10px;
       border: 1px solid #ddd;

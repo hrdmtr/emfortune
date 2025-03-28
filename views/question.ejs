@@ -55,7 +55,7 @@
     </header>
     <main>
       <div class="question-section">
-        <h2>質問</h2>
+        <h2><% if (questionData.title) { %><%= questionData.title %><% } else { %>質問<% } %> <span class="category-tag"><%= questionData.category || '占い' %></span></h2>
         <div class="likes-count" id="likes-count">
           <span class="like-icon">👍</span> <span id="likes-number">0</span> 人が役に立ったと言っています
         </div>

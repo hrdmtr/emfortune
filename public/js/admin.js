@@ -533,6 +533,31 @@ document.addEventListener('DOMContentLoaded', function() {
           // 取得したデータをフォームにセット
           document.getElementById('modal-title').textContent = '質問を編集';
           document.getElementById('question-id').value = data.id; // 質問IDをセット
+          document.getElementById('question-title').value = data.title || '';
+          
+          // カテゴリーを設定
+          const categorySelect = document.getElementById('question-category');
+          if (data.category) {
+            // カテゴリーが既存のオプションに存在するか確認
+            let found = false;
+            for (let i = 0; i < categorySelect.options.length; i++) {
+              if (categorySelect.options[i].value === data.category) {
+                categorySelect.selectedIndex = i;
+                found = true;
+                break;
+              }
+            }
+            // 存在しない場合は新しいオプションを追加
+            if (!found) {
+              const newOption = new Option(data.category, data.category);
+              categorySelect.add(newOption);
+              categorySelect.value = data.category;
+            }
+          } else {
+            // デフォルトのカテゴリー（最初のオプション）を選択
+            categorySelect.selectedIndex = 0;
+          }
+          
           document.getElementById('question-text').value = data.text;
           
           // 共有テキストがあれば設定

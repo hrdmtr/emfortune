@@ -26,6 +26,8 @@ const loadQuestions = () => {
         // CSVから読み込んだデータを適切な形式に変換
         const question = {
           id: parseInt(data.id),
+          title: data.title || '',
+          category: data.category || '占い',
           text: data.text,
           options: [
             { id: 'A', text: data.optionA_text, image: fixImagePath(data.optionA_image) },
@@ -61,6 +63,8 @@ const saveQuestion = async (questionData) => {
       maxId = Math.max(maxId, question.id);
       if (questionData.id && question.id === parseInt(questionData.id)) {
         // 既存の質問を更新
+        question.title = questionData.title || '';
+        question.category = questionData.category || '占い';
         question.text = questionData.text;
         question.options[0].text = questionData.optionA_text;
         question.options[0].image = questionData.optionA_image;
@@ -78,6 +82,8 @@ const saveQuestion = async (questionData) => {
     if (isNewQuestion) {
       const newQuestion = {
         id: questionData.id ? parseInt(questionData.id) : maxId + 1,
+        title: questionData.title || '',
+        category: questionData.category || '占い',
         text: questionData.text,
         options: [
           { id: 'A', text: questionData.optionA_text, image: questionData.optionA_image },
@@ -91,10 +97,12 @@ const saveQuestion = async (questionData) => {
     }
     
     // 質問データをCSVに変換
-    const header = 'id,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image,share_text\n';
+    const header = 'id,title,category,text,optionA_text,optionA_image,optionB_text,optionB_image,optionC_text,optionC_image,optionD_text,optionD_image,share_text\n';
     const rows = questions.map(q => {
       return [
         q.id,
+        q.title || '',
+        q.category || '占い',
         q.text,
         q.options[0].text,
         q.options[0].image,

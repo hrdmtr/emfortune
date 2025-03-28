@@ -186,6 +186,21 @@ footer a.admin-link:hover {
   color: #7c4dff;
   text-align: center;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.category-tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  background-color: #e3d9ff;
+  color: #7c4dff;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: normal;
 }
 
 .question-text {
