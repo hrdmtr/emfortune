@@ -56,6 +56,7 @@
         </div>
         <div class="retry-button-container">
           <a href="/question" class="retry-button">もう一度占う</a>
+          <button id="create-question-btn" class="create-button">新しい質問を作る</button>
         </div>
         
         <!-- Google AdSense レクタングル広告 -->
@@ -77,5 +78,295 @@
     </footer>
   </div>
   <script src="/js/main.js"></script>
+  
+  <!-- 質問作成モーダル -->
+  <div id="question-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modal-title">新しい質問を作成</h3>
+      <form id="question-form">
+        <!-- 質問ID (hidden) -->
+        <input type="hidden" id="question-id" name="id">
+        <div class="form-group">
+          <label for="question-text">質問内容</label>
+          <input type="text" id="question-text" name="text" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="share-text">Twitter共有用テキスト</label>
+          <input type="text" id="share-text" name="share_text" placeholder="この質問をTwitterでシェアする際の文言" maxlength="100">
+          <p class="field-help">空欄の場合はデフォルトのテキストが使用されます</p>
+        </div>
+        
+        <!-- オプションA -->
+        <div class="option-group">
+          <h4>選択肢A</h4>
+          <div class="form-group">
+            <label for="optionA-text">テキスト</label>
+            <input type="text" id="optionA-text" name="optionA_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionA-image">画像URL</label>
+            <input type="text" id="optionA-image" name="optionA_image" value="/images/option-a.png" required>
+          </div>
+        </div>
+        
+        <!-- オプションB -->
+        <div class="option-group">
+          <h4>選択肢B</h4>
+          <div class="form-group">
+            <label for="optionB-text">テキスト</label>
+            <input type="text" id="optionB-text" name="optionB_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionB-image">画像URL</label>
+            <input type="text" id="optionB-image" name="optionB_image" value="/images/option-b.png" required>
+          </div>
+        </div>
+        
+        <!-- オプションC -->
+        <div class="option-group">
+          <h4>選択肢C</h4>
+          <div class="form-group">
+            <label for="optionC-text">テキスト</label>
+            <input type="text" id="optionC-text" name="optionC_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionC-image">画像URL</label>
+            <input type="text" id="optionC-image" name="optionC_image" value="/images/option-c.png" required>
+          </div>
+        </div>
+        
+        <!-- オプションD -->
+        <div class="option-group">
+          <h4>選択肢D</h4>
+          <div class="form-group">
+            <label for="optionD-text">テキスト</label>
+            <input type="text" id="optionD-text" name="optionD_text" required>
+          </div>
+          <div class="form-group">
+            <label for="optionD-image">画像URL</label>
+            <input type="text" id="optionD-image" name="optionD_image" value="/images/option-d.png" required>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">保存</button>
+          <button type="button" class="secondary-btn modal-cancel">キャンセル</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- モーダル用のCSS -->
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .form-group input[type="text"],
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .option-group {
+      background-color: #f8f5ff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .primary-btn {
+      background-color: #7c4dff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .secondary-btn {
+      background-color: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .field-help {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 5px;
+    }
+  </style>
+  
+  <!-- 質問作成機能のJavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // モーダル関連の要素
+      const questionModal = document.getElementById('question-modal');
+      const createQuestionBtn = document.getElementById('create-question-btn');
+      const closeButtons = questionModal.querySelectorAll('.close, .modal-cancel');
+      
+      // 質問作成ボタンのクリックイベント
+      if (createQuestionBtn) {
+        createQuestionBtn.addEventListener('click', function() {
+          // フォームをリセット
+          document.getElementById('question-form').reset();
+          
+          // 質問IDを空にする（新規作成モード）
+          document.getElementById('question-id').value = '';
+          
+          // モーダルを表示
+          questionModal.style.display = 'block';
+        });
+      }
+      
+      // モーダルを閉じる機能
+      closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          questionModal.style.display = 'none';
+        });
+      });
+      
+      // 背景クリックでモーダルを閉じる
+      window.addEventListener('click', function(event) {
+        if (event.target === questionModal) {
+          questionModal.style.display = 'none';
+        }
+      });
+      
+      // 質問フォーム送信
+      const questionForm = document.getElementById('question-form');
+      if (questionForm) {
+        questionForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // 削除キーの入力を求める
+          const deleteKey = prompt('質問を作成・編集するには作成キーを入力してください：');
+          
+          // キャンセルされた場合
+          if (deleteKey === null) {
+            return;
+          }
+          
+          // 作成キーの検証（0618に設定）
+          if (deleteKey !== '0618') {
+            alert('作成キーが正しくありません。正しいキーを入力してください。');
+            return;
+          }
+          
+          // フォームデータの取得
+          const formData = new FormData(this);
+          const questionData = {};
+          
+          for (const [key, value] of formData.entries()) {
+            questionData[key] = value;
+          }
+          
+          // 送信中の状態表示
+          const submitButton = this.querySelector('button[type="submit"]');
+          const originalButtonText = submitButton.textContent;
+          submitButton.textContent = '保存中...';
+          submitButton.disabled = true;
+          
+          // サーバーへ送信
+          fetch('/admin/question', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(questionData)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              // モーダルを閉じる
+              questionModal.style.display = 'none';
+              
+              // 保存成功の通知
+              alert(data.message);
+              
+              // 新しい質問を開くオプションを提供
+              if (confirm('新しい質問を試してみますか？')) {
+                window.location.href = '/question';
+              }
+            } else {
+              throw new Error(data.error || '不明なエラーが発生しました');
+            }
+          })
+          .catch(error => {
+            console.error('質問保存エラー:', error);
+            alert('質問の保存に失敗しました: ' + error.message);
+            
+            // ボタンを元に戻す
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+          });
+        });
+      }
+    });
+  </script>
 </body>
 </html>

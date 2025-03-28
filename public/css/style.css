@@ -577,6 +577,10 @@ footer a.admin-link:hover {
 .retry-button-container {
   text-align: center;
   margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
 .retry-button {
@@ -592,6 +596,23 @@ footer a.admin-link:hover {
 
 .retry-button:hover {
   background-color: #6a3de8;
+}
+
+.create-button {
+  display: inline-block;
+  padding: 12px 30px;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.create-button:hover {
+  background-color: #3d8b40;
 }
 
 /* Google AdSense 広告用のスタイル */
