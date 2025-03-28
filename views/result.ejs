@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <meta name="description" content="あなたの診断結果: <%= result.personality %>。<%= result.description.substring(0, 100) %>...">
+  <meta property="og:title" content="診断結果: <%= result.personality %> | EMFortune心理占い">
+  <meta property="og:description" content="<%= result.description.substring(0, 100) %>...">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= typeof baseUrl !== 'undefined' ? baseUrl : 'https://emfortune.onrender.com' %>">
+  <meta property="og:image" content="<%= typeof baseUrl !== 'undefined' ? baseUrl : 'https://emfortune.onrender.com' %>/images/ogp-image.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -15,7 +22,7 @@
       <div class="result-section">
         <h2>診断結果</h2>
         <div class="result-image">
-          <img src="<%= result.image %>" alt="<%= result.personality %>" class="personality-image">
+          <img src="<%= result.image %>" alt="<%= result.personality %>" class="personality-image" onerror="this.onerror=null; this.src='/images/results/default-type.png';">
         </div>
         <div class="result-type">
           <h3><%= result.personality %></h3>

@@ -308,10 +308,14 @@ footer a.admin-link:hover {
 
 .personality-image {
   width: 100%;
+  max-width: 300px;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(124, 77, 255, 0.2);
   transition: transform 0.3s ease;
+  object-fit: contain;
+  background-color: #f8f5ff;
+  padding: 10px;
 }
 
 .personality-image:hover {

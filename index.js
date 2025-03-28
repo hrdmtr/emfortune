@@ -173,7 +173,16 @@ app.post('/result', async (req, res) => {
     // 結果表示の統計を記録
     incrementResultView(answer);
     
-    res.render('result', { title: '診断結果', result });
+    // アプリのベースURLを取得（共有用）
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const baseUrl = `${protocol}://${host}`;
+    
+    res.render('result', { 
+      title: `${result.personality} | EMFortune診断結果`, 
+      result,
+      baseUrl
+    });
   } catch (error) {
     console.error('結果の処理中にエラーが発生しました:', error);
     res.status(500).send('結果の処理中にエラーが発生しました');
@@ -342,13 +351,52 @@ app.post('/admin/crop', ensureAuthenticated, (req, res) => {
       fs.mkdirSync(targetDir, { recursive: true });
     }
     
+    // Base64データからMIME型を抽出して適切な拡張子を決定
+    const mimeTypeMatch = cropData.match(/^data:image\/(\w+);base64,/);
+    let fileExtension = '.png'; // デフォルト拡張子
+    
+    if (mimeTypeMatch && mimeTypeMatch[1]) {
+      const mimeType = mimeTypeMatch[1].toLowerCase();
+      // MIMEタイプに基づいて適切な拡張子を設定
+      switch (mimeType) {
+        case 'jpeg':
+        case 'jpg':
+          fileExtension = '.jpg';
+          break;
+        case 'png':
+          fileExtension = '.png';
+          break;
+        case 'gif':
+          fileExtension = '.gif';
+          break;
+        case 'webp':
+          fileExtension = '.webp';
+          break;
+        case 'svg+xml':
+          fileExtension = '.svg';
+          break;
+        default:
+          fileExtension = '.png'; // デフォルト拡張子
+      }
+      console.log(`検出されたMIMEタイプ: ${mimeType}, 使用する拡張子: ${fileExtension}`);
+    } else {
+      console.log('MIMEタイプが検出できませんでした。デフォルト拡張子(.png)を使用します。');
+    }
+    
+    // 拡張子を変更（元の拡張子を新しい拡張子に置換）
+    const baseFileName = newFullPath.replace(/\.[^/.]+$/, ""); // 拡張子を除いたベース名
+    const newFilePathWithCorrectExt = baseFileName + fileExtension;
+    
     // Base64データをバッファに変換
     const base64Data = cropData.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
     
     // 新しいファイルへ書き込み
-    fs.writeFileSync(newFullPath, buffer);
-    console.log('画像を保存しました:', newFullPath);
+    fs.writeFileSync(newFilePathWithCorrectExt, buffer);
+    console.log('画像を保存しました:', newFilePathWithCorrectExt);
+    
+    // 相対パスの拡張子も更新
+    newRelativePath = newRelativePath.replace(/\.[^/.]+$/, "") + fileExtension;
     
     // 絶対パスではなく、webルートからの相対パスを返す
     const webPath = '/' + newRelativePath.replace(/\\/g, '/');

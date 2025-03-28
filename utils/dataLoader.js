@@ -183,6 +183,20 @@ const loadResults = () => {
           relationshipCompatibility: data.relationshipCompatibility,
           image: data.image || `/images/results/default-${data.option.toLowerCase()}.png`
         };
+        
+        // 画像パスが設定されている場合、ファイルの存在を確認
+        if (results[data.option].image) {
+          const imagePath = path.join(__dirname, '../public', results[data.option].image.startsWith('/') ? 
+                                      results[data.option].image.substring(1) : 
+                                      results[data.option].image);
+          
+          if (!fs.existsSync(imagePath)) {
+            console.log(`警告: 画像ファイルが見つかりません: ${imagePath}`);
+            console.log(`デフォルト画像を使用します: /images/results/default-type.png`);
+            // 見つからない場合はデフォルトのフォールバック画像を使用
+            results[data.option].image = `/images/results/default-type.png`;
+          }
+        }
       })
       .on('end', () => {
         resolve(results);
@@ -283,11 +297,41 @@ const getResult = async (answer) => {
       personality: '不明',
       description: '回答が見つかりませんでした。',
       workCompatibility: '情報がありません。',
-      relationshipCompatibility: '情報がありません。'
+      relationshipCompatibility: '情報がありません。',
+      image: `/images/results/default-${answer.toLowerCase()}.png`
     };
     
     // 結果オブジェクトにタイプ（選択肢ID）を追加
     result.type = answer;
+    
+    // 画像パスの検証と修正
+    if (!result.image || result.image === '' || result.image === 'undefined') {
+      // デフォルト画像を設定
+      result.image = `/images/results/default-type.png`;
+      console.log(`診断結果 ${answer} に画像が設定されていません。デフォルト画像を使用します。`);
+    } else if (result.image.startsWith('http://')) {
+      // httpから始まる場合は修正
+      result.image = result.image.replace(/^http:\/\/[^\/]+/, '');
+    }
+    
+    // パスが/で始まっていない場合は修正
+    if (result.image && !result.image.startsWith('/')) {
+      result.image = '/' + result.image;
+    }
+    
+    // 画像ファイルの存在を確認
+    const imagePath = path.join(__dirname, '../public', result.image.startsWith('/') ? 
+                               result.image.substring(1) : 
+                               result.image);
+    
+    if (!fs.existsSync(imagePath)) {
+      console.log(`警告: 画像ファイルが見つかりません: ${imagePath}`);
+      console.log(`代替のデフォルト画像を使用します: /images/results/default-type.png`);
+      result.image = `/images/results/default-type.png`;
+    }
+    
+    console.log(`診断結果 ${answer} の画像パス: ${result.image}`);
+    
     return result;
   } catch (error) {
     console.error('結果データの読み込みエラー:', error);
@@ -296,7 +340,8 @@ const getResult = async (answer) => {
       description: '結果データを読み込めませんでした。',
       workCompatibility: '情報がありません。',
       relationshipCompatibility: '情報がありません。',
-      type: answer
+      type: answer,
+      image: `/images/results/default-type.png`
     };
   }
 };

@@ -11,6 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
   }
   
+  // 結果画像の読み込みエラー処理
+  const personalityImage = document.querySelector('.personality-image');
+  if (personalityImage) {
+    personalityImage.addEventListener('error', function() {
+      console.error('結果画像の読み込みに失敗しました:', this.src);
+      // デフォルト画像へのフォールバック（既にHTMLのonerrorでも設定）
+      this.src = '/images/results/default-type.png';
+    });
+  }
+  
   // いいね機能の実装
   const likeButton = document.getElementById('like-button');
   if (likeButton) {
