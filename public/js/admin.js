@@ -564,16 +564,49 @@ document.addEventListener('DOMContentLoaded', function() {
     button.addEventListener('click', function() {
       const option = this.getAttribute('data-option');
       
-      // 本来はここでサーバーから結果データを取得する
-      // ここでは簡易的に実装
+      // フォームをリセットして読み込み中表示
+      document.getElementById('result-form').reset();
       document.getElementById('result-option').value = option;
       
-      // フォームに結果データをセット（実際の実装では非同期通信で取得）
-      // ここではモックデータを使用
-      document.getElementById('personality').value = 'タイプ名';
-      document.getElementById('description').value = '説明文がここに表示されます。';
-      document.getElementById('workCompatibility').value = '仕事との相性の説明';
-      document.getElementById('relationshipCompatibility').value = '人間関係の相性の説明';
+      // ローディング表示
+      document.getElementById('personality').value = '読み込み中...';
+      document.getElementById('description').value = '読み込み中...';
+      
+      // サーバーから結果データを取得
+      fetch(`/admin/result/${option}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('結果データの取得に失敗しました');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // 取得したデータをフォームにセット
+          document.getElementById('personality').value = data.personality;
+          document.getElementById('description').value = data.description;
+          document.getElementById('workCompatibility').value = data.workCompatibility;
+          document.getElementById('relationshipCompatibility').value = data.relationshipCompatibility;
+          document.getElementById('result-image').value = data.image;
+          
+          // 画像プレビューも更新
+          const previewDiv = document.getElementById('preview-result');
+          updateImagePreview(previewDiv, data.image);
+        })
+        .catch(error => {
+          console.error('エラー:', error);
+          alert('結果データの取得に失敗しました。');
+          
+          // エラー時はデフォルト値を設定
+          document.getElementById('personality').value = 'タイプ名';
+          document.getElementById('description').value = '説明文がここに表示されます。';
+          document.getElementById('workCompatibility').value = '仕事との相性の説明';
+          document.getElementById('relationshipCompatibility').value = '人間関係の相性の説明';
+          document.getElementById('result-image').value = `/images/results/default-${option.toLowerCase()}.png`;
+          
+          // 空のプレビューを表示
+          const previewDiv = document.getElementById('preview-result');
+          updateImagePreview(previewDiv, '');
+        });
       
       resultModal.style.display = 'block';
     });
@@ -694,14 +727,48 @@ document.addEventListener('DOMContentLoaded', function() {
         resultData[key] = value;
       }
       
-      // 本来はここでサーバーへ送信
-      console.log('結果データを送信:', resultData);
+      // 送信中の状態表示
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.textContent;
+      submitButton.textContent = '保存中...';
+      submitButton.disabled = true;
       
-      // モーダルを閉じる
-      resultModal.style.display = 'none';
-      
-      // 成功したら通知
-      alert('診断結果が保存されました');
+      // サーバーへ結果データを送信
+      fetch('/admin/result', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(resultData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('サーバーエラー: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // モーダルを閉じる
+          resultModal.style.display = 'none';
+          
+          // 保存成功の通知
+          alert(data.message);
+          
+          // ページをリロードして更新された一覧を表示
+          window.location.reload();
+        } else {
+          throw new Error(data.error || '不明なエラーが発生しました');
+        }
+      })
+      .catch(error => {
+        console.error('診断結果保存エラー:', error);
+        alert('診断結果の保存に失敗しました: ' + error.message);
+        
+        // ボタンを元に戻す
+        submitButton.textContent = originalButtonText;
+        submitButton.disabled = false;
+      });
     });
   }
 });

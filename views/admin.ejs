@@ -273,6 +273,21 @@
           <textarea id="relationshipCompatibility" name="relationshipCompatibility" rows="2" required></textarea>
         </div>
         
+        <div class="form-group">
+          <label for="result-image">診断結果イメージ</label>
+          <div class="image-input-container">
+            <div class="file-input-group">
+              <input type="text" id="result-image" name="image" placeholder="/images/results/example.png" required>
+              <div class="upload-actions">
+                <label class="upload-btn" for="result-image-file">画像を選択</label>
+                <input type="file" id="result-image-file" class="file-input" accept="image/*" data-target="result-image">
+              </div>
+            </div>
+            <div class="image-preview" id="preview-result"></div>
+          </div>
+          <div class="upload-status" id="status-result"></div>
+        </div>
+        
         <div class="form-actions">
           <button type="submit" class="primary-btn">保存</button>
           <button type="button" class="secondary-btn modal-cancel">キャンセル</button>

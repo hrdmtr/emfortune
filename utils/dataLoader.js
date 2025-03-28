@@ -177,7 +177,8 @@ const loadResults = () => {
           personality: data.personality,
           description: data.description,
           workCompatibility: data.workCompatibility,
-          relationshipCompatibility: data.relationshipCompatibility
+          relationshipCompatibility: data.relationshipCompatibility,
+          image: data.image || `/images/results/default-${data.option.toLowerCase()}.png`
         };
       })
       .on('end', () => {
@@ -187,6 +188,54 @@ const loadResults = () => {
         reject(error);
       });
   });
+};
+
+// 診断結果データの保存
+const saveResult = async (resultData) => {
+  try {
+    // 既存の結果を読み込む
+    const results = await loadResults();
+    
+    // 指定されたオプションの結果を更新
+    if (resultData.option && ['A', 'B', 'C', 'D'].includes(resultData.option)) {
+      // 既存の結果を更新または新規作成
+      results[resultData.option] = {
+        personality: resultData.personality,
+        description: resultData.description,
+        workCompatibility: resultData.workCompatibility,
+        relationshipCompatibility: resultData.relationshipCompatibility,
+        image: resultData.image || `/images/results/default-${resultData.option.toLowerCase()}.png`
+      };
+    } else {
+      return { success: false, error: '無効なオプションが指定されています' };
+    }
+    
+    // 結果データをCSVに変換
+    const header = 'option,personality,description,workCompatibility,relationshipCompatibility,image\n';
+    const rows = Object.keys(results).map(option => {
+      const r = results[option];
+      return [
+        option,
+        r.personality,
+        r.description,
+        r.workCompatibility,
+        r.relationshipCompatibility,
+        r.image
+      ].map(value => `"${String(value).replace(/"/g, '""')}"`).join(',');
+    }).join('\n');
+    
+    // CSVファイルに保存
+    const csvContent = header + rows;
+    await fs.promises.writeFile(
+      path.join(__dirname, '../data/results/results.csv'),
+      csvContent
+    );
+    
+    return { success: true };
+  } catch (error) {
+    console.error('診断結果データ保存エラー:', error);
+    return { success: false, error: error.message };
+  }
 };
 
 // ランダムな質問を取得（前回と異なる質問を返す）
@@ -255,5 +304,6 @@ module.exports = {
   getRandomQuestion,
   getResult,
   saveQuestion,
+  saveResult,
   deleteQuestion
 };

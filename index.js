@@ -212,6 +212,34 @@ app.get('/admin/question/:id', ensureAuthenticated, async (req, res) => {
   }
 });
 
+// 診断結果データ取得API（認証必須）
+app.get('/admin/result/:option', ensureAuthenticated, async (req, res) => {
+  try {
+    const { loadResults } = require('./utils/dataLoader');
+    const option = req.params.option.toUpperCase();
+    
+    // 有効なオプションかチェック
+    if (!['A', 'B', 'C', 'D'].includes(option)) {
+      return res.status(400).json({ error: '無効なオプションです' });
+    }
+    
+    const results = await loadResults();
+    const result = results[option];
+    
+    if (!result) {
+      return res.status(404).json({ error: '指定された診断結果が見つかりません' });
+    }
+    
+    // オプション情報を追加
+    result.option = option;
+    
+    res.json(result);
+  } catch (error) {
+    console.error('診断結果データの取得エラー:', error);
+    res.status(500).json({ error: '診断結果データの取得中にエラーが発生しました' });
+  }
+});
+
 // 画像アップロードAPI（認証必須）
 app.post('/admin/upload', ensureAuthenticated, upload.single('image'), (req, res) => {
   try {
@@ -331,6 +359,37 @@ app.post('/admin/question', ensureAuthenticated, async (req, res) => {
     console.error('質問保存エラー:', error);
     res.status(500).json({ 
       error: '質問の保存中にエラーが発生しました', 
+      message: error.message 
+    });
+  }
+});
+
+// 診断結果保存API（認証必須）
+app.post('/admin/result', ensureAuthenticated, async (req, res) => {
+  try {
+    const { saveResult } = require('./utils/dataLoader');
+    const resultData = req.body;
+    
+    console.log('診断結果の保存リクエスト:', resultData);
+    
+    // 診断結果データの保存
+    const result = await saveResult(resultData);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: '診断結果が更新されました'
+      });
+    } else {
+      res.status(500).json({ 
+        error: '診断結果の保存中にエラーが発生しました',
+        message: result.error
+      });
+    }
+  } catch (error) {
+    console.error('診断結果保存エラー:', error);
+    res.status(500).json({ 
+      error: '診断結果の保存中にエラーが発生しました', 
       message: error.message 
     });
   }
