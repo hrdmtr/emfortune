@@ -92,11 +92,28 @@ app.get('/', (req, res) => {
 // 質問ページのルート
 app.get('/question', async (req, res) => {
   try {
-    // セッションから前回の質問IDを取得
-    const previousQuestionId = req.session.lastQuestionId || null;
+    // URLからquestion_idパラメータを取得
+    const requestedQuestionId = req.query.id ? parseInt(req.query.id) : null;
+    let questionData;
     
-    // 前回と異なる質問を取得
-    const questionData = await getRandomQuestion(previousQuestionId);
+    if (requestedQuestionId) {
+      // 特定の質問IDが指定されている場合
+      const { loadQuestions } = require('./utils/dataLoader');
+      const questions = await loadQuestions();
+      questionData = questions.find(q => q.id === requestedQuestionId);
+      
+      // 指定された質問が見つからない場合はランダムな質問を提供
+      if (!questionData) {
+        console.log(`指定された質問ID ${requestedQuestionId} が見つかりません。ランダムな質問を提供します。`);
+        questionData = await getRandomQuestion();
+      }
+    } else {
+      // セッションから前回の質問IDを取得
+      const previousQuestionId = req.session.lastQuestionId || null;
+      
+      // 前回と異なる質問を取得
+      questionData = await getRandomQuestion(previousQuestionId);
+    }
     
     // 画像パスを確認して修正
     questionData.options.forEach(option => {
@@ -123,7 +140,17 @@ app.get('/question', async (req, res) => {
     // 質問表示の統計を記録
     incrementQuestionView(questionData.id);
     
-    res.render('question', { title: '質問', questionData });
+    // アプリのベースURLを取得
+    const protocol = req.protocol;
+    const host = req.get('host');
+    const baseUrl = `${protocol}://${host}`;
+    const shareUrl = `${baseUrl}/question?id=${questionData.id}`;
+    
+    res.render('question', { 
+      title: '質問', 
+      questionData,
+      shareUrl
+    });
   } catch (error) {
     console.error('質問の取得中にエラーが発生しました:', error);
     res.status(500).send('質問の読み込み中にエラーが発生しました');

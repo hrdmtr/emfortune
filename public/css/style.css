@@ -267,19 +267,39 @@ footer a.admin-link:hover {
   margin-top: 15px;
 }
 
-.twitter-share {
-  display: inline-block;
+.twitter-share, .twitter-share-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 10px 20px;
   background-color: #1DA1F2;
   color: white;
   text-decoration: none;
+  border: none;
   border-radius: 50px;
   font-weight: bold;
-  transition: background-color 0.3s;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.twitter-share:hover {
+.twitter-share:hover, .twitter-share-button:hover {
   background-color: #0c85d0;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.share-question-section {
+  text-align: center;
+  margin-bottom: 20px;
+  background-color: #f8f5ff;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.share-info {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 5px;
 }
 
 /* サムアップボタンのスタイル */
