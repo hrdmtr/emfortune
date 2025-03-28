@@ -488,13 +488,42 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // 質問追加ボタンのイベントリスナー
+  console.log('質問追加ボタン要素:', addQuestionBtn);
   if (addQuestionBtn) {
+    console.log('質問追加ボタンにイベントリスナーを追加します');
     addQuestionBtn.addEventListener('click', function() {
+      console.log('質問追加ボタンがクリックされました');
       document.getElementById('modal-title').textContent = '質問を追加';
-      document.getElementById('question-form').reset();
+      
+      // フォーム要素の存在確認
+      const questionForm = document.getElementById('question-form');
+      console.log('質問フォーム要素:', questionForm);
+      if (questionForm) {
+        questionForm.reset();
+      } else {
+        console.error('質問フォーム要素が見つかりません');
+      }
+      
+      // タイトルと質問IDフィールドの存在確認
+      const questionIdField = document.getElementById('question-id');
+      const titleField = document.getElementById('question-title');
+      const categoryField = document.getElementById('question-category');
+      console.log('質問ID要素:', questionIdField);
+      console.log('タイトル要素:', titleField);
+      console.log('カテゴリー要素:', categoryField);
       
       // 質問IDを空にする（新規追加モード）
-      document.getElementById('question-id').value = '';
+      if (questionIdField) {
+        questionIdField.value = '';
+      }
+      
+      // デフォルト値の設定
+      if (titleField) {
+        titleField.value = '';
+      }
+      if (categoryField) {
+        categoryField.selectedIndex = 0;
+      }
       
       // すべてのプレビューを空の状態に更新
       ['A', 'B', 'C', 'D'].forEach(letter => {
@@ -504,8 +533,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
       
+      // モーダルを表示
+      console.log('質問モーダル要素:', questionModal);
       questionModal.style.display = 'block';
     });
+  } else {
+    console.error('質問追加ボタンが見つかりません');
   }
   
   // 質問編集ボタンのイベントリスナー
@@ -514,12 +547,35 @@ document.addEventListener('DOMContentLoaded', function() {
       const questionId = this.getAttribute('data-id');
       const questionRow = this.closest('tr');
       
+      console.log('質問編集ボタンがクリックされました、質問ID:', questionId);
+      
       // ローディング表示
       document.getElementById('modal-title').textContent = '質問を編集中...';
-      document.getElementById('question-form').reset();
+      
+      // フォームのリセット前に存在確認
+      const questionForm = document.getElementById('question-form');
+      console.log('質問フォーム要素（編集）:', questionForm);
+      
+      if (questionForm) {
+        questionForm.reset();
+      } else {
+        console.error('質問フォーム要素が見つかりません（編集）');
+      }
       
       // 実際のデータを取得（テーブルから）
-      const questionText = questionRow.querySelector('td:nth-child(2)').textContent;
+      // テーブルの列構造を確認（インデックスが変わっている可能性があるため）
+      console.log('テーブル行要素:', questionRow);
+      console.log('テーブル行の子要素:', questionRow.querySelectorAll('td'));
+      
+      const questionTitle = questionRow.querySelector('td:nth-child(2)').textContent;
+      const questionCategory = questionRow.querySelector('td:nth-child(3) .category-tag').textContent;
+      const questionText = questionRow.querySelector('td:nth-child(4)').textContent;
+      
+      console.log('取得した行データ:', { 
+        title: questionTitle, 
+        category: questionCategory, 
+        text: questionText 
+      });
       
       // 非同期でCSVから該当の質問データを取得
       fetch(`/admin/question/${questionId}`)
@@ -709,23 +765,49 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 質問フォーム送信
   const questionForm = document.getElementById('question-form');
+  console.log('質問フォーム（送信処理）:', questionForm);
+  
   if (questionForm) {
+    console.log('質問フォームにsubmitイベントリスナーを追加します');
     questionForm.addEventListener('submit', function(e) {
+      console.log('質問フォームが送信されました');
       e.preventDefault();
+      
+      // フォームデータの取得前にフォームの内容をログに出力
+      console.log('フォーム内の要素:', this.elements);
+      
+      // タイトルとカテゴリーフィールドの確認
+      const titleField = document.getElementById('question-title');
+      const categoryField = document.getElementById('question-category');
+      console.log('タイトルフィールド:', titleField, titleField ? titleField.value : 'なし');
+      console.log('カテゴリーフィールド:', categoryField, categoryField ? categoryField.value : 'なし');
       
       // フォームデータの取得
       const formData = new FormData(this);
       const questionData = {};
       
+      // すべてのフォームデータをログに出力
+      console.log('フォームデータ:');
       for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
         questionData[key] = value;
+      }
+      
+      console.log('送信する質問データ:', questionData);
+      
+      // 必須フィールドが空でないことを確認
+      if (!questionData.text) {
+        alert('質問内容は必須です。');
+        return;
       }
       
       // 送信中の状態表示
       const submitButton = this.querySelector('button[type="submit"]');
-      const originalButtonText = submitButton.textContent;
-      submitButton.textContent = '保存中...';
-      submitButton.disabled = true;
+      const originalButtonText = submitButton ? submitButton.textContent : '保存';
+      if (submitButton) {
+        submitButton.textContent = '保存中...';
+        submitButton.disabled = true;
+      }
       
       // サーバーへ送信
       fetch('/admin/question', {
@@ -736,12 +818,14 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify(questionData)
       })
       .then(response => {
+        console.log('サーバーからのレスポンスステータス:', response.status);
         if (!response.ok) {
           throw new Error('サーバーエラー: ' + response.status);
         }
         return response.json();
       })
       .then(data => {
+        console.log('サーバーからのレスポンスデータ:', data);
         if (data.success) {
           // モーダルを閉じる
           questionModal.style.display = 'none';
@@ -760,10 +844,14 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('質問の保存に失敗しました: ' + error.message);
         
         // ボタンを元に戻す
-        submitButton.textContent = originalButtonText;
-        submitButton.disabled = false;
+        if (submitButton) {
+          submitButton.textContent = originalButtonText;
+          submitButton.disabled = false;
+        }
       });
     });
+  } else {
+    console.error('質問フォームが見つかりません。質問の保存機能は無効です。');
   }
   
   // 結果フォーム送信

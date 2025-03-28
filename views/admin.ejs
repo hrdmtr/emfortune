@@ -9,6 +9,18 @@
   <link rel="stylesheet" href="/css/dashboard.css">
   <!-- Cropper.js v2 - 公式スタイルシートのみを使用 -->
   <link rel="stylesheet" href="/node_modules/cropperjs/dist/cropper.min.css">
+  <!-- デバッグ用のスクリプト -->
+  <script>
+    // コンソールログ出力を強化
+    const originalConsoleLog = console.log;
+    console.log = function() {
+      originalConsoleLog.apply(console, arguments);
+      // 時刻を追加してログ出力
+      const time = new Date().toISOString();
+      const args = Array.prototype.slice.call(arguments);
+      originalConsoleLog.apply(console, [`[${time}]`, ...args]);
+    };
+  </script>
 </head>
 <body>
   <div class="container">
