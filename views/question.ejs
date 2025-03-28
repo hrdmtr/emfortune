@@ -27,7 +27,20 @@
             </svg>
             この質問をシェア
           </button>
+          
+          <div class="url-copy-container">
+            <input type="text" id="share-url-input" value="<%= shareUrl %>" readonly>
+            <button id="copy-url-button" class="copy-button" onclick="copyShareUrl()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+              </svg>
+              コピー
+            </button>
+          </div>
+          
           <p class="share-info">質問URLをシェアして友達にもやってもらおう！</p>
+          <p id="copy-status" class="copy-status" style="display: none;">URLをクリップボードにコピーしました！</p>
         </div>
         <form action="/result" method="post" class="options-container">
           <% questionData.options.forEach(option => { %>
@@ -55,6 +68,65 @@
       const shareText = encodeURIComponent('<%= questionData.shareText %>');
       const shareUrl = encodeURIComponent('<%= shareUrl %>');
       window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank');
+    }
+    
+    function copyShareUrl() {
+      const shareUrlInput = document.getElementById('share-url-input');
+      const copyStatus = document.getElementById('copy-status');
+      const copyButton = document.getElementById('copy-url-button');
+      
+      // テキストを選択してクリップボードにコピー
+      shareUrlInput.select();
+      shareUrlInput.setSelectionRange(0, 99999); // モバイル対応
+      
+      try {
+        // クリップボードにコピー
+        navigator.clipboard.writeText(shareUrlInput.value)
+          .then(() => {
+            // コピー成功時の処理
+            copyStatus.style.display = 'block';
+            copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg> コピーしました';
+            copyButton.classList.add('copied');
+            
+            // 3秒後に元に戻す
+            setTimeout(() => {
+              copyStatus.style.display = 'none';
+              copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> コピー';
+              copyButton.classList.remove('copied');
+            }, 3000);
+          })
+          .catch(err => {
+            console.error('クリップボードへのコピーに失敗しました:', err);
+            fallbackCopyToClipboard(shareUrlInput.value);
+          });
+      } catch (err) {
+        // 新しいAPIに対応していないブラウザ向けのフォールバック処理
+        fallbackCopyToClipboard(shareUrlInput.value);
+      }
+    }
+    
+    // フォールバックのコピー処理（古いブラウザ用）
+    function fallbackCopyToClipboard(text) {
+      try {
+        // execCommandを使用した古い方法
+        document.execCommand('copy');
+        
+        const copyStatus = document.getElementById('copy-status');
+        const copyButton = document.getElementById('copy-url-button');
+        
+        copyStatus.style.display = 'block';
+        copyButton.classList.add('copied');
+        copyButton.textContent = 'コピーしました';
+        
+        setTimeout(() => {
+          copyStatus.style.display = 'none';
+          copyButton.classList.remove('copied');
+          copyButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> コピー';
+        }, 3000);
+      } catch (err) {
+        console.error('コピーに失敗しました:', err);
+        alert('コピーに失敗しました。手動でURLを選択してコピーしてください。');
+      }
     }
   </script>
 </body>

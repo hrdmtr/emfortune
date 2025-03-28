@@ -302,6 +302,57 @@ footer a.admin-link:hover {
   margin-top: 5px;
 }
 
+.url-copy-container {
+  display: flex;
+  max-width: 100%;
+  margin: 12px auto;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#share-url-input {
+  flex-grow: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  font-size: 14px;
+  color: #555;
+  background-color: #fff;
+}
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  background-color: #e0e0e0;
+}
+
+.copy-button.copied {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.copy-status {
+  font-size: 14px;
+  color: #4caf50;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
 /* サムアップボタンのスタイル */
 .like-section {
   margin: 30px 0;
