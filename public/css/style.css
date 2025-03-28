@@ -594,6 +594,18 @@ footer a.admin-link:hover {
   background-color: #6a3de8;
 }
 
+/* Google AdSense 広告用のスタイル */
+.ad-container {
+  margin: 30px auto;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  clear: both;
+  padding: 10px 0;
+  background-color: #f8f5ff;
+  border-radius: 8px;
+}
+
 /* 権限エラーページのスタイル */
 .error-section {
   padding: 30px 20px;
